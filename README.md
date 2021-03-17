@@ -41,7 +41,7 @@ This structure can be fully described simply from its size (19).
 
 <br>
 
-🚧 MMR is currently under construction - a hardhat is recommended beyond this point 🚧
+🚧 **MMR is currently under construction - a hardhat is recommended beyond this point** 🚧
 
 <br>
 

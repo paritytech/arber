@@ -1,213 +1,81 @@
 //! Utiility functions mainly for MMR navigation
 
-#![allow(dead_code)]
+#![allow(dead_code, unused_macros)]
 
-/// Return the height of a node at `idx`.
-pub fn height(mut idx: u64) -> u32 {
-    idx += 1;
+/// 64-bit all being binary ones: 0b1111111...1
+const ALL_ONES: u64 = u64::MAX;
 
-    let all_ones = |n: u64| n != 0 && n.count_zeros() == n.leading_zeros();
-
-    let jmp_left = |i: u64| {
-        let len = 64 - i.leading_zeros();
-        let msb = 1 << (len - 1);
-        i - (msb - 1)
-    };
-
-    while !all_ones(idx) {
-        idx = jmp_left(idx)
+/// Return the indices for all peaks given a MMR with `size` nodes.
+///
+/// Peaks are listed left to right, starting with the leftmost peak. The leftmost
+/// peak is also always the 'highest' peak.
+///
+/// Note that for an 'unstable' MMR, the result vector will be empty! We denote
+/// a MMR as unstable if the given number of nodes would lead to two leaf nodes.
+/// For example, the MMR below with `size = 5` is unstable.
+/// ```no
+///    2
+///   / \
+///  0   1   3   4
+/// ```
+pub(crate) fn peaks(size: u64) -> Vec<u64> {
+    if size == 0 {
+        return vec![];
     }
 
-    64 - idx.leading_zeros() - 1
-}
+    let mut peak_idx = ALL_ONES >> size.leading_zeros();
+    let mut nodes_left = size;
+    let mut last_peak_idx = 0;
+    let mut peaks = vec![];
 
-/// Return peak node indices for a MMR with `size` nodes.
-pub fn peaks(size: u64) -> Vec<u64> {
-    let mut peaks = Vec::new();
-    let (mut height, mut idx) = summit(size);
+    while peak_idx != 0 {
+        if nodes_left >= peak_idx {
+            peaks.push(last_peak_idx + peak_idx);
+            last_peak_idx += peak_idx;
+            nodes_left -= peak_idx;
+        }
+        peak_idx >>= 1;
+    }
 
-    peaks.push(idx);
-
-    while height > 0 {
-        let peak = match next_peak(height, idx, size) {
-            Some(peak) => peak,
-            None => break, // no more peaks
-        };
-        height = peak.0;
-        idx = peak.1;
-        peaks.push(idx);
+    // if, at this point, we have a node left, the MMR is unstable.
+    if nodes_left > 0 {
+        return vec![];
     }
 
     peaks
 }
 
-/// Return index of the peak at `height`.
-///
-/// This will always be the largest index that is inside the tree. In other words, the
-/// index of the peak will always be less than the total size of the tree.
-fn peak_idx(height: u32) -> u64 {
-    (1 << (height + 1)) - 2
-}
-
-/// Return the index of the next node with and index larger than `idx` that is at the
-/// same `height`, i.e. the right sibling.
-fn right_sibling(idx: u64, height: u32) -> u64 {
-    let d = (2 << height) - 1;
-    idx + d
-}
-
-/// Return the index of the left child node at `height` of a parent node at `idx`.
-///
-/// Note that `height` is the height of the child, not the parent itself!
-fn left_child(idx: u64, height: u32) -> u64 {
-    let d = 2 << height;
-    idx - d
-}
-
-/// Return the height and index of the highest peak for an MMR with `size` nodes.
-///
-/// The highest peak will always be the first, leftmost peak. This is because nodes
-/// are added from the left to the rright.
-fn summit(size: u64) -> (u32, u64) {
-    let mut height = 1;
-    let mut prev = 0;
-    let mut idx = peak_idx(height);
-
-    while idx < size {
-        height += 1;
-        prev = idx;
-        idx = peak_idx(height);
-    }
-
-    (height - 1, prev)
-}
-
-/// Return the height and index of the next peak, given the `height` and `idx` of the
-/// current peak for an MMR with `size` nodes. The next peak is always at the right side
-/// of the current peak.
-fn next_peak(mut height: u32, mut idx: u64, size: u64) -> Option<(u32, u64)> {
-    idx = right_sibling(idx, height);
-
-    while idx > size - 1 {
-        if height == 0 {
-            return None;
-        }
-        height -= 1;
-        idx = left_child(idx, height);
-    }
-
-    Some((height, idx))
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{height, left_child, next_peak, peak_idx, peaks, right_sibling, summit};
-
-    #[test]
-    fn height_works() {
-        let got = height(0);
-        assert_eq!(0, got);
-
-        let got = height(2);
-        assert_eq!(1, got);
-
-        let got = height(6);
-        assert_eq!(2, got);
-
-        let got = height(14);
-        assert_eq!(3, got);
-
-        let got = height(13);
-        assert_eq!(2, got);
-
-        let got = height(17);
-        assert_eq!(1, got);
-
-        let got = height(18);
-        assert_eq!(0, got);
-    }
+    use super::peaks;
 
     #[test]
     fn peaks_works() {
-        let got = peaks(19);
-        assert_eq!(vec![14, 17, 18], got);
+        const UNSTABLE: Vec<u64> = vec![];
 
-        let got = peaks(11);
-        assert_eq!(vec![6, 9, 10], got);
-    }
+        // a MMR with zero nodes is viewed as unstable
+        assert_eq!(peaks(0), UNSTABLE);
 
-    #[test]
-    fn peak_idx_works() {
-        let got = peak_idx(1);
-        assert_eq!(2, got);
+        assert_eq!(peaks(1), [1]);
+        // the canonical unstable case
+        assert_eq!(peaks(2), UNSTABLE);
+        assert_eq!(peaks(3), [3]);
+        assert_eq!(peaks(4), [3, 4]);
+        assert_eq!(peaks(5), UNSTABLE);
+        assert_eq!(peaks(6), UNSTABLE);
+        assert_eq!(peaks(7), [7]);
+        assert_eq!(peaks(8), [7, 8]);
+        assert_eq!(peaks(9), UNSTABLE);
+        assert_eq!(peaks(10), [7, 10]);
+        assert_eq!(peaks(11), [7, 10, 11]);
+        assert_eq!(peaks(19), [15, 18, 19]);
 
-        let got = peak_idx(2);
-        assert_eq!(6, got);
+        let want: Vec<u64> = vec![
+            524_287, 786_430, 917_501, 983_036, 1_015_803, 1_032_186, 1_040_377, 1_044_472,
+            1_046_519, 1_047_542, 1_048_053, 1_048_308, 1_048_435, 1_048_498, 1_048_529, 1_048_544,
+            1_048_551, 1_048_554, 1_048_555,
+        ];
 
-        let got = peak_idx(3);
-        assert_eq!(14, got);
-    }
-
-    #[test]
-    fn right_sibling_works() {
-        let got = right_sibling(0, 0);
-        assert_eq!(1, got);
-
-        let got = right_sibling(10, 0);
-        assert_eq!(11, got);
-
-        let got = right_sibling(2, 1);
-        assert_eq!(5, got);
-
-        let got = right_sibling(9, 1);
-        assert_eq!(12, got);
-
-        let got = right_sibling(6, 2);
-        assert_eq!(13, got);
-    }
-
-    #[test]
-    fn left_child_works() {
-        let got = left_child(2, 0);
-        assert_eq!(0, got);
-
-        let got = left_child(5, 0);
-        assert_eq!(3, got);
-
-        let got = left_child(6, 1);
-        assert_eq!(2, got);
-
-        let got = left_child(13, 1);
-        assert_eq!(9, got);
-
-        let got = left_child(14, 2);
-        assert_eq!(6, got);
-    }
-
-    #[test]
-    fn summit_works() {
-        let got = summit(3);
-        assert_eq!((1, 2), got);
-
-        let got = summit(7);
-        assert_eq!((2, 6), got);
-
-        let got = summit(11);
-        assert_eq!((2, 6), got);
-
-        let got = summit(15);
-        assert_eq!((3, 14), got);
-
-        let got = summit(18);
-        assert_eq!((3, 14), got);
-    }
-
-    #[test]
-    fn next_peak_works() {
-        let got = next_peak(3, 14, 19);
-        assert!(matches!(got, Some((1, 17))));
-
-        let got = next_peak(2, 7, 11);
-        assert!(matches!(got, Some((1, 10))));
+        assert_eq!(peaks(1_048_555), want);
     }
 }

@@ -25,13 +25,13 @@ pub(crate) fn peaks(size: u64) -> Vec<u64> {
 
     let mut peak_idx = ALL_ONES >> size.leading_zeros();
     let mut nodes_left = size;
-    let mut last_peak_idx = 0;
+    let mut prev_peak_idx = 0;
     let mut peaks = vec![];
 
     while peak_idx != 0 {
         if nodes_left >= peak_idx {
-            peaks.push(last_peak_idx + peak_idx);
-            last_peak_idx += peak_idx;
+            peaks.push(prev_peak_idx + peak_idx);
+            prev_peak_idx += peak_idx;
             nodes_left -= peak_idx;
         }
         peak_idx >>= 1;

@@ -45,9 +45,32 @@ pub(crate) fn peaks(size: u64) -> Vec<u64> {
     peaks
 }
 
+/// Return the height of a node at postion `pos`.
+///
+/// The height is calculated as if the node is part of a fully balanced binary
+/// tree and the nodes are visited in postorder traversal.
+pub(crate) fn node_height(pos: u64) -> u64 {
+    let mut idx = pos.saturating_sub(1);
+
+    if idx == 0 {
+        return 0;
+    }
+
+    let mut peak_idx = ALL_ONES >> idx.leading_zeros();
+
+    while peak_idx != 0 {
+        if idx >= peak_idx {
+            idx -= peak_idx;
+        }
+        peak_idx >>= 1;
+    }
+
+    idx
+}
+
 #[cfg(test)]
 mod tests {
-    use super::peaks;
+    use super::{node_height, peaks};
 
     #[test]
     fn peaks_works() {
@@ -77,5 +100,27 @@ mod tests {
         ];
 
         assert_eq!(peaks(1_048_555), want);
+    }
+
+    #[test]
+    fn node_height_works() {
+        assert_eq!(node_height(0), 0);
+        assert_eq!(node_height(1), 0);
+        assert_eq!(node_height(2), 0);
+        assert_eq!(node_height(3), 1);
+        assert_eq!(node_height(4), 0);
+        assert_eq!(node_height(5), 0);
+        assert_eq!(node_height(6), 1);
+        assert_eq!(node_height(7), 2);
+        assert_eq!(node_height(8), 0);
+        assert_eq!(node_height(10), 1);
+        assert_eq!(node_height(15), 3);
+        assert_eq!(node_height(16), 0);
+        assert_eq!(node_height(18), 1);
+        assert_eq!(node_height(19), 0);
+        assert_eq!(node_height(28), 1);
+        assert_eq!(node_height(29), 2);
+        assert_eq!(node_height(30), 3);
+        assert_eq!(node_height(31), 4);
     }
 }

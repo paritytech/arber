@@ -68,9 +68,44 @@ pub(crate) fn node_height(pos: u64) -> u64 {
     idx
 }
 
+/// Return the height of the MMR peaks **before** a node at (0-based) position `pos`
+/// is added as well as the height node `pos` itself will be added.
+///
+/// This information is returned as a tuple of the form `(peak_map, node_height)`.
+/// The peak heights are encoded as a bitmap.
+///
+/// For example `peak_height_map(4)` will return `(0b11, 0)`, as the MMR at this
+///  point looked like:
+/// ```no
+///    2
+///   / \
+///  0   1   3
+/// ```
+/// The return value `(0b11, 0)` indicates, that there are peaks at heights 0 and 1.
+/// The node itself will be positioned at height 0.
+pub(crate) fn peak_height_map(mut pos: u64) -> (u64, u64) {
+    if pos == 0 {
+        return (0, 0);
+    }
+
+    let mut peak_idx = ALL_ONES >> pos.leading_zeros();
+    let mut peak_map = 0;
+
+    while peak_idx != 0 {
+        peak_map <<= 1;
+        if pos >= peak_idx {
+            pos -= peak_idx;
+            peak_map |= 1;
+        }
+        peak_idx >>= 1;
+    }
+
+    (peak_map, pos)
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{node_height, peaks};
+    use super::{node_height, peak_height_map, peaks};
 
     #[test]
     fn peaks_works() {
@@ -122,5 +157,22 @@ mod tests {
         assert_eq!(node_height(29), 2);
         assert_eq!(node_height(30), 3);
         assert_eq!(node_height(31), 4);
+    }
+
+    #[test]
+    fn peak_height_map_works() {
+        assert_eq!(peak_height_map(0), (0b00, 0));
+        assert_eq!(peak_height_map(1), (0b1, 0));
+        assert_eq!(peak_height_map(2), (0b1, 1));
+        assert_eq!(peak_height_map(3), (0b10, 0));
+        assert_eq!(peak_height_map(4), (0b11, 0));
+        assert_eq!(peak_height_map(5), (0b11, 1));
+        assert_eq!(peak_height_map(6), (0b11, 2));
+        assert_eq!(peak_height_map(7), (0b100, 0));
+        assert_eq!(peak_height_map(18), (0b1010, 0));
+
+        // test edge cases
+        assert_eq!(peak_height_map(u64::MAX), ((u64::MAX >> 1) + 1, 0));
+        assert_eq!(peak_height_map(u64::MAX - 1), (u64::MAX >> 1, 63));
     }
 }

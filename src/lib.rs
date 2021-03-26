@@ -1,17 +1,17 @@
 //! Merkle-Mountain-Range implementation.
 
-use std::marker::PhantomData;
+use {std::marker::PhantomData, store::Store};
 
-use store::Store;
-
+mod error;
 mod store;
 mod utils;
 
-/// Add a dummy hash type for now
-pub struct Hash([u8; 32]);
+/// Merkle-Mountain-Range error codes
+pub use error::Error;
 
 pub struct MerkleMountainRange<'a, T, B>
 where
+    T: Clone,
     B: Store<T>,
 {
     store: &'a mut B,
@@ -20,6 +20,7 @@ where
 
 impl<'a, T, B> MerkleMountainRange<'a, T, B>
 where
+    T: Clone,
     B: Store<T>,
 {
     pub fn new(store: &'a mut B) -> Self {

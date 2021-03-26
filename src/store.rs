@@ -1,18 +1,29 @@
 //! Merkle-Mountain-Range storage
-use crate::Hash;
 
-pub trait Store<T> {
-    fn append(&mut self, data: &T, hashes: &[Hash]);
+use {crate::Error, primitive_types::H256};
+
+pub trait Store<T>
+where
+    T: Clone,
+{
+    fn append(&mut self, data: &T, hashes: &[H256]) -> Result<(), Error>;
 }
 
+#[derive(Clone, Debug)]
 pub(crate) struct VecStore<T> {
     pub data: Vec<T>,
-    pub hashes: Vec<Hash>,
+    pub hashes: Vec<H256>,
 }
 
-impl<T> Store<T> for VecStore<T> {
-    fn append(&mut self, data: &T, hashes: &[Hash]) {
-        todo!()
+impl<T> Store<T> for VecStore<T>
+where
+    T: Clone,
+{
+    fn append(&mut self, data: &T, hashes: &[H256]) -> Result<(), Error> {
+        self.data.push(data.clone());
+        self.hashes.extend_from_slice(hashes);
+
+        Ok(())
     }
 }
 

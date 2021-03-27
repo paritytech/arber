@@ -13,36 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-//! Merkle-Mountain-Range implementation.
+//! Hash type
 
-use {std::marker::PhantomData, store::Store};
-
-mod error;
-mod hash;
-mod store;
-mod utils;
-
-/// Merkle-Mountain-Range error codes
-pub use error::Error;
-
-pub use hash::Hash;
-
-pub struct MerkleMountainRange<'a, T, S>
-where
-    S: Store<T>,
-{
-    store: &'a mut S,
-    _marker: PhantomData<T>,
-}
-
-impl<'a, T, S> MerkleMountainRange<'a, T, S>
-where
-    S: Store<T>,
-{
-    pub fn new(store: &'a mut S) -> Self {
-        MerkleMountainRange {
-            store,
-            _marker: PhantomData,
-        }
-    }
-}
+/// Generic hash type which should be compatible with most hashes used
+/// within the blockchain domain.
+pub struct Hash([u8; 32]);

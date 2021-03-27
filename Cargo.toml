@@ -8,18 +8,5 @@ license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hex = { version = "0.4.*"}
-thiserror = { version = "1.0.*" }
-
-sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "master" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "master" }
-sp-std = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "master" }
-
-
-[features]
-default = ["std"]
-std = [
-    "sp-core/std",
-	"sp-runtime/std",
-    "sp-std/std",
-]
+hex = "0.4.*"
+thiserror = "1.0.*"

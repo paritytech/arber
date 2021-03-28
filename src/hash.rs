@@ -15,6 +15,35 @@
 
 //! Hash type
 
+use std::fmt::{self, Write};
+
+macro_rules! to_hex {
+    ($bytes:expr) => {{
+        let mut s = std::string::String::with_capacity(64);
+
+        for b in $bytes {
+            std::write!(&mut s, "{:02x}", b)?
+        }
+
+        Ok(s)
+    }};
+}
+
 /// Generic hash type which should be compatible with most hashes used
 /// within the blockchain domain.
 pub struct Hash([u8; 32]);
+
+impl fmt::Debug for Hash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        const DISP_SIZE: usize = 12;
+
+        let hex = to_hex!(&self.0)?;
+        write!(f, "{}", &hex[..DISP_SIZE])
+    }
+}
+
+impl fmt::Display for Hash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(self, f)
+    }
+}

@@ -21,4 +21,6 @@ use thiserror::Error;
 pub enum Error {
     #[error("generic store error: `{0}`")]
     Store(String),
+    #[error("failed to parse string: `{0}`")]
+    ParseHex(String),
 }

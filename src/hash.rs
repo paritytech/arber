@@ -15,7 +15,13 @@
 
 //! Hash type
 
-use std::fmt::{self, Write};
+use {
+    crate::Error,
+    std::{
+        cmp::min,
+        fmt::{self, Write},
+    },
+};
 
 macro_rules! to_hex {
     ($bytes:expr) => {{
@@ -31,6 +37,7 @@ macro_rules! to_hex {
 
 /// Generic hash type which should be compatible with most hashes used
 /// within the blockchain domain.
+#[derive(Copy, Clone, PartialEq)]
 pub struct Hash([u8; 32]);
 
 impl fmt::Debug for Hash {
@@ -45,5 +52,45 @@ impl fmt::Debug for Hash {
 impl fmt::Display for Hash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Debug::fmt(self, f)
+    }
+}
+
+impl Hash {
+    /// 32 byte hash
+    pub const LEN: usize = 32;
+
+    /// Return a hash initialized from `v`.
+    ///
+    /// At most, up to [`Hash::LEN`] bytes will be copied from `v`. If `v` is
+    /// shorter, the hass will be padded with 0's
+    pub fn form_vec(v: &[u8]) -> Hash {
+        let mut h = [0; Hash::LEN];
+        let sz = min(v.len(), Hash::LEN);
+        h[..sz].copy_from_slice(&v[..sz]);
+        Hash(h)
+    }
+
+    pub fn from_hex(hex: &str) -> Result<Hash, Error> {
+        todo!()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Hash;
+
+    #[test]
+    fn from_vec_works() {
+        let v = vec![1, 2, 3];
+        let h = format!("{}", Hash::form_vec(&v));
+        assert_eq!(h, "010203000000");
+
+        let v = Vec::new();
+        let h = format!("{}", Hash::form_vec(&v));
+        assert_eq!(h, "000000000000");
+
+        let v = vec![222, 173, 202, 254, 186, 190];
+        let h = format!("{}", Hash::form_vec(&v));
+        assert_eq!(h, "deadcafebabe");
     }
 }

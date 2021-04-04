@@ -159,15 +159,15 @@ mod tests {
 
     #[test]
     fn from_hex_works() {
-        let want = Hash::from_vec(&vec![]);
+        let want = Hash::from_vec(&[]);
         let got = Hash::from_hex("0x00").unwrap();
         assert_eq!(want, got);
 
-        let want = Hash::from_vec(&vec![202, 254]);
+        let want = Hash::from_vec(&[202, 254]);
         let got = Hash::from_hex("0xcafe").unwrap();
         assert_eq!(want, got);
 
-        let want = Hash::from_vec(&vec![222, 173, 202, 254, 186, 190]);
+        let want = Hash::from_vec(&[222, 173, 202, 254, 186, 190]);
         let got = Hash::from_hex("0xdeadcafebabe").unwrap();
         assert_eq!(want, got);
     }

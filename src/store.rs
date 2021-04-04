@@ -55,6 +55,12 @@ impl<T> VecStore<T> {
     }
 }
 
+impl<T> Default for VecStore<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -65,6 +71,8 @@ mod tests {
 
     #[test]
     fn append_works() {
+        #![allow(clippy::unit_cmp)]
+
         let elem = vec![0u8; 10];
         let h = elem.hash();
 

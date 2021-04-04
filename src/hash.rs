@@ -17,8 +17,10 @@
 
 use {
     crate::Error,
+    blake2::{Blake2b, Digest},
     std::{
         cmp::min,
+        convert::AsRef,
         fmt::{self, Write},
     },
 };
@@ -52,6 +54,12 @@ impl fmt::Debug for Hash {
 impl fmt::Display for Hash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Debug::fmt(self, f)
+    }
+}
+
+impl AsRef<[u8]> for Hash {
+    fn as_ref(&self) -> &[u8] {
+        &self.0
     }
 }
 
@@ -94,9 +102,45 @@ fn parse_hex(hex: &str) -> Result<Vec<u8>, String> {
     }
 }
 
+/// Types with a canonical hash
+pub trait Hashable {
+    fn hash(&self) -> Hash;
+}
+
+impl Hashable for Vec<u8> {
+    fn hash(&self) -> Hash {
+        let mut h = Blake2b::new();
+        h.update(self);
+        let v = h.finalize();
+        Hash::from_vec(&v)
+    }
+}
+
+impl Hashable for u64 {
+    fn hash(&self) -> Hash {
+        let mut h = Blake2b::new();
+        h.update(self.to_le_bytes());
+        let v = h.finalize();
+        Hash::from_vec(&v)
+    }
+}
+
+impl<T> Hashable for (u64, &T)
+where
+    T: Hashable,
+{
+    fn hash(&self) -> Hash {
+        let mut h = Blake2b::new();
+        h.update(self.0.to_le_bytes());
+        h.update(self.1.hash());
+        let v = h.finalize();
+        Hash::from_vec(&v)
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{Error, Hash};
+    use super::{Error, Hash, Hashable};
 
     #[test]
     fn from_vec_works() {
@@ -137,5 +181,48 @@ mod tests {
         let want = Error::ParseHex("thisisbad".to_string());
         let got = Hash::from_hex("0xthisisbad").err().unwrap();
         assert_eq!(want, got);
+    }
+
+    #[test]
+    fn vec_hash_works() {
+        let v1: Vec<u8> = vec![0, 0, 0, 0];
+        let h1 = v1.hash();
+
+        let v2: Vec<u8> = vec![0, 0, 0, 0];
+        let h2 = v2.hash();
+
+        let v3: Vec<u8> = vec![0, 0, 0, 1];
+        let h3 = v3.hash();
+
+        assert_eq!(h1, h2);
+        assert_ne!(h1, h3);
+        assert_ne!(h2, h3);
+    }
+
+    #[test]
+    fn u64_hash_works() {
+        let u1 = 0u64;
+        let h1 = u1.hash();
+
+        let u2 = 0u64;
+        let h2 = u2.hash();
+
+        let u3 = 1u64;
+        let h3 = u3.hash();
+
+        assert_eq!(h1, h2);
+        assert_ne!(h1, h3);
+        assert_ne!(h2, h3);
+    }
+
+    #[test]
+    fn tuple_hash_works() {
+        let h1 = (1u64, &vec![0u8; 10]).hash();
+        let h2 = (1u64, &vec![0u8; 10]).hash();
+        let h3 = (2u64, &vec![0u8; 10]).hash();
+
+        assert_eq!(h1, h2);
+        assert_ne!(h1, h3);
+        assert_ne!(h2, h3);
     }
 }

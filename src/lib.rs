@@ -22,27 +22,44 @@ mod hash;
 mod store;
 mod utils;
 
-/// Merkle-Mountain-Range error codes
 pub use error::Error;
+pub use hash::{Hash, Hashable};
 
-pub use hash::Hash;
-
+/// Merkle Mountain Range (MMR) implementation.
+///
+/// All tree positions start at '1'. MMR positions are depth-frist, post-order tree
+/// traversal node positions and should not be seen as array indices.
+///
+/// The MMR `Store`, however, is a flat list representation of the MMR, i.e. an array of
+/// nodes. Hence, `Store` elements are accessed using a '0' based index.
 pub struct MerkleMountainRange<'a, T, S>
 where
+    T: Hashable + Clone,
     S: Store<T>,
 {
+    /// Last position within the MMR
+    pub last_pos: u64,
+    // backing store for the MMR
     store: &'a mut S,
+    // make rustc happy
     _marker: PhantomData<T>,
 }
 
 impl<'a, T, S> MerkleMountainRange<'a, T, S>
 where
+    T: Hashable + Clone,
     S: Store<T>,
 {
     pub fn new(store: &'a mut S) -> Self {
         MerkleMountainRange {
+            last_pos: 0,
             store,
             _marker: PhantomData,
         }
+    }
+
+    /// Append `elem` to the MMR
+    pub fn append(&mut self, elem: &T) -> Result<u64, Error> {
+        todo!()
     }
 }

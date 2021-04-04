@@ -17,26 +17,71 @@
 
 use crate::{Error, Hash};
 
-pub trait Store<T> {
-    fn append(&mut self, data: &T, hashes: &[Hash]) -> Result<(), Error>;
+pub trait Store<T>
+where
+    T: Clone,
+{
+    fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<(), Error>;
 }
 
 pub(crate) struct VecStore<T> {
-    pub data: Vec<T>,
+    /// Optional store elements, `None` if only hashes are stored.
+    pub data: Option<Vec<T>>,
+    /// MMR hashes for both, laves and parents
     pub hashes: Vec<Hash>,
 }
 
-impl<T> Store<T> for VecStore<T> {
-    fn append(&mut self, data: &T, hashes: &[Hash]) -> Result<(), Error> {
-        todo!()
+impl<T> Store<T> for VecStore<T>
+where
+    T: Clone,
+{
+    fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<(), Error> {
+        if let Some(data) = &mut self.data {
+            data.push(elem.clone());
+        }
+
+        self.hashes.extend_from_slice(hashes);
+
+        Ok(())
     }
 }
 
 impl<T> VecStore<T> {
     pub fn new() -> Self {
         VecStore {
-            data: vec![],
+            data: Some(vec![]),
             hashes: vec![],
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use {
+        super::{Store, VecStore},
+        crate::Hashable,
+    };
+
+    #[test]
+    fn append_works() {
+        let elem = vec![0u8; 10];
+        let h = elem.hash();
+
+        let mut store = VecStore::<Vec<u8>>::new();
+        let res = store.append(&elem, &[h]).unwrap();
+
+        assert_eq!((), res);
+        assert_eq!(elem, store.data.clone().unwrap()[0]);
+        assert_eq!(h, store.hashes[0]);
+
+        let elem = vec![1u8; 10];
+        let h = elem.hash();
+
+        let res = store.append(&elem, &[h]).unwrap();
+
+        assert_eq!((), res);
+        assert_eq!(elem, store.data.unwrap()[1]);
+        assert_eq!(h, store.hashes[1]);
     }
 }

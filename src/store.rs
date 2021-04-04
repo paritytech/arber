@@ -24,7 +24,7 @@ where
     fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<(), Error>;
 }
 
-pub(crate) struct VecStore<T> {
+pub struct VecStore<T> {
     /// Optional store elements, `None` if only hashes are stored.
     pub data: Option<Vec<T>>,
     /// MMR hashes for both, laves and parents

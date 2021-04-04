@@ -15,7 +15,7 @@
 
 //! Merkle-Mountain-Range implementation.
 
-use {std::marker::PhantomData, store::Store};
+use std::marker::PhantomData;
 
 mod error;
 mod hash;
@@ -24,6 +24,7 @@ mod utils;
 
 pub use error::Error;
 pub use hash::{Hash, Hashable};
+pub use store::{Store, VecStore};
 
 /// Merkle Mountain Range (MMR) implementation.
 ///
@@ -60,6 +61,12 @@ where
 
     /// Append `elem` to the MMR
     pub fn append(&mut self, elem: &T) -> Result<u64, Error> {
-        todo!()
+        let idx = self.last_pos;
+        let node_hash = (idx, elem).hash();
+        let hashes = vec![node_hash];
+
+        self.store.append(elem, &hashes)?;
+        self.last_pos += 1;
+        Ok(self.last_pos)
     }
 }

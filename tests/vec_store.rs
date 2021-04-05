@@ -32,5 +32,5 @@ fn append_two_nodes() {
     let n2 = vec![1u8, 10];
     let pos = mmr.append(&n2).unwrap();
 
-    assert_eq!(2, pos);
+    assert_eq!(3, pos);
 }

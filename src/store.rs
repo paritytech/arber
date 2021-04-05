@@ -22,6 +22,8 @@ where
     T: Clone,
 {
     fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<(), Error>;
+
+    fn peak_hash_at(&self, idx: u64) -> Result<Hash, Error>;
 }
 
 pub struct VecStore<T> {
@@ -44,6 +46,13 @@ where
 
         Ok(())
     }
+
+    fn peak_hash_at(&self, idx: u64) -> Result<Hash, Error> {
+        self.hashes
+            .get(idx as usize)
+            .cloned()
+            .ok_or(Error::Store(format!("missing peak hash at: {}", idx)))
+    }
 }
 
 impl<T> VecStore<T> {
@@ -65,7 +74,7 @@ impl<T> Default for VecStore<T> {
 mod tests {
 
     use {
-        super::{Store, VecStore},
+        super::{Error, Store, VecStore},
         crate::Hashable,
     };
 
@@ -91,5 +100,32 @@ mod tests {
         assert_eq!((), res);
         assert_eq!(elem, store.data.unwrap()[1]);
         assert_eq!(h, store.hashes[1]);
+    }
+
+    #[test]
+    fn peak_hash_at_works() {
+        let mut store = VecStore::<Vec<u8>>::new();
+
+        let elem = vec![0u8; 10];
+        let h = elem.hash();
+        let _ = store.append(&elem, &[h]);
+
+        let elem = vec![1u8; 10];
+        let h = elem.hash();
+        let _ = store.append(&elem, &[h]);
+
+        let peak = store.peak_hash_at(1).unwrap();
+
+        assert_eq!(h, peak);
+    }
+
+    #[test]
+    fn peak_hash_at_fails() {
+        let want = Error::Store(format!("missing peak hash at: 3"));
+
+        let store = VecStore::<Vec<u8>>::new();
+        let got = store.peak_hash_at(3);
+
+        assert_eq!(Err(want), got);
     }
 }

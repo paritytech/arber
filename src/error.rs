@@ -19,7 +19,7 @@ use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
 pub enum Error {
-    #[error("generic store error: `{0}`")]
+    #[error("store error: `{0}`")]
     Store(String),
     #[error("failed to parse string as hex: `{0}`")]
     ParseHex(String),

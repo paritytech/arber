@@ -125,13 +125,20 @@ impl Hashable for u64 {
     }
 }
 
-impl<T> Hashable for (u64, &T)
+impl Hashable for Hash {
+    fn hash(&self) -> Hash {
+        *self
+    }
+}
+
+impl<A, B> Hashable for (A, B)
 where
-    T: Hashable,
+    A: Hashable,
+    B: Hashable,
 {
     fn hash(&self) -> Hash {
         let mut h = Blake2b::new();
-        h.update(self.0.to_le_bytes());
+        h.update(self.0.hash());
         h.update(self.1.hash());
         let v = h.finalize();
         Hash::from_vec(&v)
@@ -217,9 +224,9 @@ mod tests {
 
     #[test]
     fn tuple_hash_works() {
-        let h1 = (1u64, &vec![0u8; 10]).hash();
-        let h2 = (1u64, &vec![0u8; 10]).hash();
-        let h3 = (2u64, &vec![0u8; 10]).hash();
+        let h1 = (1u64, vec![0u8; 10]).hash();
+        let h2 = (1u64, vec![0u8; 10]).hash();
+        let h3 = (2u64, vec![0u8; 10]).hash();
 
         assert_eq!(h1, h2);
         assert_ne!(h1, h3);

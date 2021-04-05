@@ -84,7 +84,7 @@ pub(crate) fn node_height(pos: u64) -> u64 {
 }
 
 /// Return the height of the MMR peaks **before** a node at (0-based) index `idx`
-/// is added as well as the height node `pos` itself will be added.
+/// is added as well as the height node `idx` itself will be added.
 ///
 /// This information is returned as a tuple of the form `(peak_map, node_height)`.
 /// The peak heights are encoded as a bitmap.

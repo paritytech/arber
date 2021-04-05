@@ -83,7 +83,7 @@ pub(crate) fn node_height(pos: u64) -> u64 {
     idx
 }
 
-/// Return the height of the MMR peaks **before** a node at (0-based) position `pos`
+/// Return the height of the MMR peaks **before** a node at (0-based) index `idx`
 /// is added as well as the height node `pos` itself will be added.
 ///
 /// This information is returned as a tuple of the form `(peak_map, node_height)`.
@@ -98,24 +98,24 @@ pub(crate) fn node_height(pos: u64) -> u64 {
 /// ```
 /// The return value `(0b11, 0)` indicates, that there are peaks at heights 0 and 1.
 /// The node itself will be positioned at height 0.
-pub(crate) fn peak_height_map(mut pos: u64) -> (u64, u64) {
-    if pos == 0 {
+pub(crate) fn peak_height_map(mut idx: u64) -> (u64, u64) {
+    if idx == 0 {
         return (0, 0);
     }
 
-    let mut peak_idx = ALL_ONES >> pos.leading_zeros();
+    let mut peak_idx = ALL_ONES >> idx.leading_zeros();
     let mut peak_map = 0;
 
     while peak_idx != 0 {
         peak_map <<= 1;
-        if pos >= peak_idx {
-            pos -= peak_idx;
+        if idx >= peak_idx {
+            idx -= peak_idx;
             peak_map |= 1;
         }
         peak_idx >>= 1;
     }
 
-    (peak_map, pos)
+    (peak_map, idx)
 }
 
 #[cfg(test)]

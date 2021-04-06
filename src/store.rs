@@ -51,7 +51,7 @@ where
         self.hashes
             .get(idx as usize)
             .cloned()
-            .ok_or(Error::Store(format!("missing peak hash at: {}", idx)))
+            .ok_or_else(|| Error::Store(format!("missing peak hash at: {}", idx)))
     }
 }
 
@@ -121,7 +121,7 @@ mod tests {
 
     #[test]
     fn peak_hash_at_fails() {
-        let want = Error::Store(format!("missing peak hash at: 3"));
+        let want = Error::Store("missing peak hash at: 3".to_string());
 
         let store = VecStore::<Vec<u8>>::new();
         let got = store.peak_hash_at(3);

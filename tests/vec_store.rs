@@ -41,7 +41,7 @@ fn append_multiple_nodes() {
     let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
     let mut size = 0;
 
-    (0..=10 as u8).for_each(|i| {
+    (0..=10u8).for_each(|i| {
         let n = vec![i, 10];
         size = mmr.append(&n).unwrap();
     });

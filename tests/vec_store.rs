@@ -34,3 +34,17 @@ fn append_two_nodes() {
 
     assert_eq!(3, pos);
 }
+
+#[test]
+fn append_multiple_nodes() {
+    let mut s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+    let mut size = 0;
+
+    (0..=10 as u8).for_each(|i| {
+        let n = vec![i, 10];
+        size = mmr.append(&n).unwrap();
+    });
+
+    assert_eq!(19, size);
+}

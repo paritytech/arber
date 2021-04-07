@@ -85,6 +85,34 @@ where
         Ok(self.size)
     }
 
+    pub fn validate(&self) -> Result<bool, Error> {
+        for pos in 1..=self.size {
+            let height = utils::node_height(pos);
+
+            if height > 0 {
+                let idx = pos - 1u64;
+
+                if let Ok(hash) = self.store.hash_at(idx) {
+                    let left_idx = idx - (1 << height);
+                    let right_idx = idx - 1;
+
+                    if let Ok(left_hash) = self.store.hash_at(left_idx) {
+                        if let Ok(right_hash) = self.store.hash_at(right_idx) {
+                            let tmp = (left_hash, right_hash).hash();
+                            let tmp = (idx, tmp).hash();
+
+                            if tmp != hash {
+                                return Err(Error::Store("guru meditation".to_string()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(true)
+    }
+
     /// Calculate single MMR root by 'bagging the peaks'.
     ///
     /// Return the number of new nodes added as well as a merkle path to the MMR root.
@@ -102,12 +130,13 @@ where
             let left_sibling = idx + 1 - 2 * height;
             let peak = self.store.peak_hash_at(left_sibling)?;
 
+            idx += 1; // idx for new peak
+
             tmp_hash = (peak, tmp_hash).hash();
             tmp_hash = (idx, tmp_hash).hash();
             merkle_path.push(tmp_hash);
 
             height *= 2;
-            idx += 1;
             new += 1;
         }
 
@@ -156,5 +185,19 @@ mod tests {
         let pos = mmr.append(&n3).unwrap();
 
         assert_eq!(4, pos);
+    }
+
+    #[test]
+    fn validate_works() {
+        let mut s = VecStore::<E>::new();
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+        let mut size = 0;
+
+        (0..=2u8).for_each(|i| {
+            let n = vec![i, 10];
+            size = mmr.append(&n).unwrap();
+        });
+
+        assert!(mmr.validate().unwrap());
     }
 }

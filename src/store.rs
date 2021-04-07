@@ -23,6 +23,8 @@ where
 {
     fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<(), Error>;
 
+    fn hash_at(&self, idx: u64) -> Result<Hash, Error>;
+
     fn peak_hash_at(&self, idx: u64) -> Result<Hash, Error>;
 }
 
@@ -45,6 +47,13 @@ where
         self.hashes.extend_from_slice(hashes);
 
         Ok(())
+    }
+
+    fn hash_at(&self, idx: u64) -> Result<Hash, Error> {
+        self.hashes
+            .get(idx as usize)
+            .cloned()
+            .ok_or_else(|| Error::Store(format!("missing hash at: {}", idx)))
     }
 
     fn peak_hash_at(&self, idx: u64) -> Result<Hash, Error> {
@@ -125,6 +134,33 @@ mod tests {
 
         let store = VecStore::<Vec<u8>>::new();
         let got = store.peak_hash_at(3);
+
+        assert_eq!(Err(want), got);
+    }
+
+    #[test]
+    fn hash_at_works() {
+        let mut store = VecStore::<Vec<u8>>::new();
+
+        let elem = vec![0u8; 10];
+        let h = elem.hash();
+        let _ = store.append(&elem, &[h]);
+
+        let elem = vec![1u8; 10];
+        let h = elem.hash();
+        let _ = store.append(&elem, &[h]);
+
+        let peak = store.hash_at(1).unwrap();
+
+        assert_eq!(h, peak);
+    }
+
+    #[test]
+    fn hash_at_fails() {
+        let want = Error::Store("missing hash at: 3".to_string());
+
+        let store = VecStore::<Vec<u8>>::new();
+        let got = store.hash_at(3);
 
         assert_eq!(Err(want), got);
     }

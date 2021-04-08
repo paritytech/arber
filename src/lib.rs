@@ -85,27 +85,31 @@ where
         Ok(self.size)
     }
 
+    /// Validate the MMR by re-calculating the hash of all inner, i.e. parent nodes.
+    /// Retrun `true`, if the MMR is valid or an error.
     pub fn validate(&self) -> Result<bool, Error> {
         for pos in 1..=self.size {
             let height = utils::node_height(pos);
 
+            // inner nodes, i.e. parents start at height 1
             if height > 0 {
                 let idx = pos - 1u64;
 
-                if let Ok(hash) = self.store.hash_at(idx) {
-                    let left_idx = idx - (1 << height);
-                    let right_idx = idx - 1;
+                // recalculate parent hash
+                let left_idx = idx - (1 << height);
+                let left_hash = self.store.hash_at(left_idx)?;
 
-                    if let Ok(left_hash) = self.store.hash_at(left_idx) {
-                        if let Ok(right_hash) = self.store.hash_at(right_idx) {
-                            let tmp = (left_hash, right_hash).hash();
-                            let tmp = (idx, tmp).hash();
+                let right_idx = idx - 1;
+                let right_hash = self.store.hash_at(right_idx)?;
 
-                            if tmp != hash {
-                                return Err(Error::Store("guru meditation".to_string()));
-                            }
-                        }
-                    }
+                let tmp = (left_hash, right_hash).hash();
+                let tmp = (idx, tmp).hash();
+
+                // check against expected parent hash
+                let parent_hash = self.store.hash_at(idx)?;
+
+                if tmp != parent_hash {
+                    return Err(Error::Store("guru meditation".to_string()));
                 }
             }
         }
@@ -198,13 +202,26 @@ mod tests {
     fn validate_works() {
         let mut s = VecStore::<E>::new();
         let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
-        let mut size = 0;
 
-        (0..=2u8).for_each(|i| {
-            let n = vec![i, 10];
-            size = mmr.append(&n).unwrap();
-        });
+        // empty MMR is valid
+        assert!(mmr.validate().unwrap());
 
+        let n1 = vec![0u8, 10];
+        let mut size = mmr.append(&n1).unwrap();
+
+        assert_eq!(1, size);
+        assert!(mmr.validate().unwrap());
+
+        let n2 = vec![1u8, 10];
+        size = mmr.append(&n2).unwrap();
+
+        assert_eq!(3, size);
+        assert!(mmr.validate().unwrap());
+
+        let n3 = vec![2u8, 10];
+        size = mmr.append(&n3).unwrap();
+
+        assert_eq!(4, size);
         assert!(mmr.validate().unwrap());
     }
 }

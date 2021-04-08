@@ -113,31 +113,38 @@ where
         Ok(true)
     }
 
-    /// Calculate single MMR root by 'bagging the peaks'.
+    /// Calculate a single MMR root by 'bagging the peaks'.
     ///
     /// Return the number of new nodes added as well as a merkle path to the MMR root.
+    ///
+    /// `peak_map` is obtained from  [`utils::peak_height_map`] and contains an encoded
+    /// list of the height for already exisiting MMR peaks.
     fn bag_the_peaks(&self, node_hash: Hash, peak_map: u64) -> Result<(u64, Vec<Hash>), Error> {
+        // start with the node added before `node_hash`
         let mut idx = self.size;
+        // number of new nodes added while bagging
         let mut new = 0;
+        // current height encoded as power of 2
         let mut height = 1u64;
+        // merkle path to the root, always starts with the new node
         let mut merkle_path = vec![node_hash];
-        let mut tmp_hash = node_hash;
+        // init peak hash with new node
+        let mut peak_hash = node_hash;
 
-        // at least one new node is added
-        new += 1;
+        new += 1; // we add at least `node_hash`
 
         while (peak_map & height) != 0 {
-            let left_sibling = idx + 1 - 2 * height;
-            let peak = self.store.peak_hash_at(left_sibling)?;
+            let left_idx = idx + 1 - 2 * height;
+            let left_hash = self.store.peak_hash_at(left_idx)?;
 
             idx += 1; // idx for new peak
 
-            tmp_hash = (peak, tmp_hash).hash();
-            tmp_hash = (idx, tmp_hash).hash();
-            merkle_path.push(tmp_hash);
+            peak_hash = (left_hash, peak_hash).hash();
+            peak_hash = (idx, peak_hash).hash();
+            merkle_path.push(peak_hash);
 
-            height *= 2;
-            new += 1;
+            height *= 2; // next power of 2
+            new += 1; // new peak added
         }
 
         Ok((new, merkle_path))

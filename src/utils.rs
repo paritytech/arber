@@ -97,7 +97,7 @@ pub(crate) fn node_height(pos: u64) -> u64 {
 ///  0   1   3
 /// ```
 /// The return value `(0b11, 0)` indicates, that there are peaks at heights 0 and 1.
-/// The node itself will be positioned at height 0.
+/// The new node itself will be positioned at height 0.
 pub(crate) fn peak_height_map(mut idx: u64) -> (u64, u64) {
     if idx == 0 {
         return (0, 0);

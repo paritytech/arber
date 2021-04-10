@@ -157,7 +157,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{MerkleMountainRange, VecStore};
+    use super::{Error, Hash, MerkleMountainRange, VecStore};
 
     type E = Vec<u8>;
 
@@ -223,5 +223,23 @@ mod tests {
 
         assert_eq!(4, size);
         assert!(mmr.validate().unwrap());
+    }
+
+    #[test]
+    fn validate_fails() {
+        let mut s = VecStore::<E>::new();
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+
+        (0..=2u8).for_each(|i| {
+            let n = vec![i, 10];
+            let _ = mmr.append(&n).unwrap();
+        });
+
+        let want = Error::Store("guru meditation".to_string());
+
+        mmr.store.hashes[2] = Hash::from_hex("0x00").unwrap();
+        let got = mmr.validate().err().unwrap();
+
+        assert_eq!(want, got);
     }
 }

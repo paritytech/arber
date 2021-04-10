@@ -109,7 +109,10 @@ where
                 let parent_hash = self.store.hash_at(idx)?;
 
                 if tmp != parent_hash {
-                    return Err(Error::Store("guru meditation".to_string()));
+                    return Err(Error::Validate(format!(
+                        "idx {}: {} != {}",
+                        idx, parent_hash, tmp
+                    )));
                 }
             }
         }
@@ -235,9 +238,24 @@ mod tests {
             let _ = mmr.append(&n).unwrap();
         });
 
-        let want = Error::Store("guru meditation".to_string());
+        let want = Error::Validate("idx 2: 000000000000 != 1a5b9c214809".to_string());
 
         mmr.store.hashes[2] = Hash::from_hex("0x00").unwrap();
+        let got = mmr.validate().err().unwrap();
+
+        assert_eq!(want, got);
+
+        s = VecStore::<E>::new();
+        mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+
+        (0..=6u8).for_each(|i| {
+            let n = vec![i, 10];
+            let _ = mmr.append(&n).unwrap();
+        });
+
+        let want = Error::Validate("idx 6: 000000000000 != 7ddd7eb278f9".to_string());
+
+        mmr.store.hashes[6] = Hash::from_hex("0x00").unwrap();
         let got = mmr.validate().err().unwrap();
 
         assert_eq!(want, got);

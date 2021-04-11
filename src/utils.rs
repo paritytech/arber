@@ -118,9 +118,9 @@ pub(crate) fn peak_height_map(mut idx: u64) -> (u64, u64) {
     (peak_map, idx)
 }
 
-/// For a given `start` position calculate the parent and sibling positions for
-/// a path up to the `peak` position. This `family_path` will contain the nodes
-/// needed in order to generate a membership Merkle proof for node `start`.
+/// For a given node at position `pos` calculate the parent and sibling positions
+///  for a path up to the `end_pos` node. This `family_path` will contain the nodes
+/// needed in order to generate a membership Merkle proof for the node at `pos`.
 ///
 /// For example, given the tree below, the family path for position '8' would be
 /// '9 - 13 - 7'.
@@ -140,37 +140,35 @@ pub(crate) fn peak_height_map(mut idx: u64) -> (u64, u64) {
 /// The returned family path is encoded as a vector of tuples. Each tuple is of
 /// the form `(parent, sibling)`, where `sibling` is the position of the tree node
 /// needed in order to calculate the hash for `parent`. Starting with the node
-/// at position `start`.
+/// at position `pos`.
 ///
 /// For example, given the tree above and starting at node '8', the encoded family
 /// path will look like:
 /// ```no
 /// [(10, 9), (14, 13), (15, 7)]
 /// ```
-pub(crate) fn family_path(start: u64, peak: u64) -> Vec<(u64, u64)> {
+pub(crate) fn family_path(pos: u64, end_pos: u64) -> Vec<(u64, u64)> {
     let mut path = vec![];
-
-    let (peak_map, node_height) = peak_height_map(start - 1);
-    let mut peak_height = 1 << node_height;
-
-    let mut current = start;
+    let (peak_map, node_height) = peak_height_map(pos - 1);
+    let mut parent_height = 1 << node_height;
+    let mut node_pos = pos;
     let mut sibling;
 
-    while current < peak {
-        if (peak_map & peak_height) != 0 {
-            current += 1;
-            sibling = current - 2 * peak_height;
+    while node_pos < end_pos {
+        if (peak_map & parent_height) != 0 {
+            node_pos += 1;
+            sibling = node_pos - 2 * parent_height;
         } else {
-            current += 2 * peak_height;
-            sibling = current - 1;
+            node_pos += 2 * parent_height;
+            sibling = node_pos - 1;
         };
 
-        if current > peak {
+        if node_pos > end_pos {
             break;
         }
 
-        path.push((current, sibling));
-        peak_height <<= 1;
+        path.push((node_pos, sibling));
+        parent_height <<= 1;
     }
 
     path

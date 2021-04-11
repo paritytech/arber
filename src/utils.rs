@@ -118,9 +118,67 @@ pub(crate) fn peak_height_map(mut idx: u64) -> (u64, u64) {
     (peak_map, idx)
 }
 
+/// For a given `start` position calculate the parent and sibling positions for
+/// a path up to the `peak` position. This `family_path` will contain the nodes
+/// needed in order to generate a membership Merkle proof for node `start`.
+///
+/// For example, given the tree below, the family path for position '8' would be
+/// '9 - 13 - 7'.
+///
+///```no
+///               15
+///            /      \
+///           /        \
+///          /          \
+///         /            \
+///        7             14
+///      /    \        /    \
+///     3      6      10     13     
+///    / \    /  \   /  \   /  \   
+///   1   2  4    5 8    9 11  12
+///````
+/// The returned family path is encoded as a vector of tuples. Each tuple is of
+/// the form `(parent, sibling)`, where `sibling` is the position of the tree node
+/// needed in order to calculate the hash for `parent`. Starting with the node
+/// at position `start`.
+///
+/// For example, given the tree above and starting at node '8', the encoded family
+/// path will look like:
+/// ```no
+/// [(10, 9), (14, 13), (15, 7)]
+/// ```
+pub(crate) fn family_path(start: u64, peak: u64) -> Vec<(u64, u64)> {
+    let mut path = vec![];
+
+    let (peak_map, node_height) = peak_height_map(start - 1);
+    let mut peak_height = 1 << node_height;
+
+    let mut current = start;
+    let mut sibling;
+
+    while current < peak {
+        if (peak_map & peak_height) != 0 {
+            current += 1;
+            sibling = current - 2 * peak_height;
+        } else {
+            current += 2 * peak_height;
+            sibling = current - 1;
+        };
+
+        if current > peak {
+            break;
+        }
+
+        path.push((current, sibling));
+        peak_height <<= 1;
+    }
+
+    path
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{node_height, peak_height_map, peaks};
+    use super::{family_path, node_height, peak_height_map, peaks};
 
     #[test]
     fn peaks_works() {
@@ -189,5 +247,20 @@ mod tests {
         // test edge cases
         assert_eq!(peak_height_map(u64::MAX), ((u64::MAX >> 1) + 1, 0));
         assert_eq!(peak_height_map(u64::MAX - 1), (u64::MAX >> 1, 63));
+    }
+
+    #[test]
+    fn family_path_works() {
+        let path = family_path(1, 3);
+        assert_eq!(vec![(3, 2)], path);
+
+        let path = family_path(1, 7);
+        assert_eq!(vec![(3, 2), (7, 6)], path);
+
+        let path = family_path(1, 15);
+        assert_eq!(vec![(3, 2), (7, 6), (15, 14)], path);
+
+        let path = family_path(8, 15);
+        assert_eq!(vec![(10, 9), (14, 13), (15, 7)], path);
     }
 }

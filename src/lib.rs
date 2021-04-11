@@ -156,6 +156,27 @@ where
 
         Ok((new, merkle_path))
     }
+
+    fn bag_rhs(&self, peak_pos: u64) -> Option<Hash> {
+        let right_peaks = utils::peaks(self.size)
+            .into_iter()
+            .filter(|&x| x > peak_pos)
+            .filter_map(|x| self.store.hash_at(x).ok());
+
+        let mut peak_hash = None;
+
+        right_peaks.rev().for_each(|peak| {
+            peak_hash = match peak_hash {
+                None => Some(peak),
+                Some(hash) => {
+                    let h = (peak, hash).hash();
+                    Some((self.size, h).hash())
+                }
+            }
+        });
+
+        peak_hash
+    }
 }
 
 #[cfg(test)]
@@ -259,5 +280,30 @@ mod tests {
         let got = mmr.validate().err().unwrap();
 
         assert_eq!(want, got);
+    }
+
+    #[test]
+    fn bag_rhs_works() {
+        let mut s = VecStore::<E>::new();
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+
+        (0..=2u8).for_each(|i| {
+            let n = vec![i, 10];
+            let _ = mmr.append(&n).unwrap();
+        });
+
+        let hash = mmr.bag_rhs(3);
+        assert_eq!(None, hash);
+
+        s = VecStore::<E>::new();
+        mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+
+        (0..=6u8).for_each(|i| {
+            let n = vec![i, 10];
+            let _ = mmr.append(&n).unwrap();
+        });
+
+        let hash = mmr.bag_rhs(7).unwrap();
+        assert_eq!("449f2e6ff457".to_string(), hash.to_string());
     }
 }

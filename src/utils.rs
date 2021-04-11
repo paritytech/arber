@@ -149,7 +149,7 @@ pub(crate) fn peak_height_map(mut idx: u64) -> (u64, u64) {
 /// ```
 pub(crate) fn family_path(pos: u64, end_pos: u64) -> Vec<(u64, u64)> {
     let mut path = vec![];
-    let (peak_map, node_height) = peak_height_map(pos - 1);
+    let (peak_map, node_height) = peak_height_map(pos.saturating_sub(1));
     let mut parent_height = 1 << node_height;
     let mut node_pos = pos;
     let mut sibling;
@@ -260,5 +260,19 @@ mod tests {
 
         let path = family_path(8, 15);
         assert_eq!(vec![(10, 9), (14, 13), (15, 7)], path);
+    }
+
+    #[test]
+    fn family_path_invalid_args() {
+        const EMPTY: Vec<(u64, u64)> = vec![];
+
+        let path = family_path(1, 2);
+        assert_eq!(EMPTY, path);
+
+        let path = family_path(0, 0);
+        assert_eq!(EMPTY, path);
+
+        let path = family_path(12, 2);
+        assert_eq!(EMPTY, path)
     }
 }

@@ -19,6 +19,7 @@ use std::marker::PhantomData;
 
 mod error;
 mod hash;
+mod proof;
 mod store;
 mod utils;
 
@@ -157,6 +158,7 @@ where
         Ok((new, merkle_path))
     }
 
+    #[allow(dead_code)]
     fn bag_rhs(&self, peak_pos: u64) -> Option<Hash> {
         let right_peaks = utils::peaks(self.size)
             .into_iter()

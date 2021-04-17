@@ -15,8 +15,6 @@
 
 //! Utiility functions mainly for MMR navigation
 
-#![allow(dead_code, unused_macros)]
-
 /// 64-bit all being binary ones: 0b1111111...1
 const ALL_ONES: u64 = u64::MAX;
 
@@ -81,6 +79,13 @@ pub(crate) fn node_height(pos: u64) -> u64 {
     }
 
     idx
+}
+
+/// Return true if the node at `pos` is a leaf node.
+///
+/// This is a convenience wrapper around [`node_height`]
+pub(crate) fn is_leaf(pos: u64) -> bool {
+    node_height(pos) == 0
 }
 
 /// Return the height of the MMR peaks **before** a node at (0-based) index `idx`
@@ -176,7 +181,7 @@ pub(crate) fn family_path(pos: u64, end_pos: u64) -> Vec<(u64, u64)> {
 
 #[cfg(test)]
 mod tests {
-    use super::{family_path, node_height, peak_height_map, peaks};
+    use super::{family_path, is_leaf, node_height, peak_height_map, peaks};
 
     #[test]
     fn peaks_works() {
@@ -228,6 +233,28 @@ mod tests {
         assert_eq!(node_height(29), 2);
         assert_eq!(node_height(30), 3);
         assert_eq!(node_height(31), 4);
+    }
+
+    #[test]
+    fn is_leaf_works() {
+        assert_eq!(is_leaf(0), true);
+        assert_eq!(is_leaf(1), true);
+        assert_eq!(is_leaf(2), true);
+        assert_eq!(is_leaf(3), false);
+        assert_eq!(is_leaf(4), true);
+        assert_eq!(is_leaf(5), true);
+        assert_eq!(is_leaf(6), false);
+        assert_eq!(is_leaf(7), false);
+        assert_eq!(is_leaf(8), true);
+        assert_eq!(is_leaf(10), false);
+        assert_eq!(is_leaf(15), false);
+        assert_eq!(is_leaf(16), true);
+        assert_eq!(is_leaf(18), false);
+        assert_eq!(is_leaf(19), true);
+        assert_eq!(is_leaf(28), false);
+        assert_eq!(is_leaf(29), false);
+        assert_eq!(is_leaf(30), false);
+        assert_eq!(is_leaf(31), false);
     }
 
     #[test]

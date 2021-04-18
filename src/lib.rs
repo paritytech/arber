@@ -134,12 +134,20 @@ where
 
         self.store.hash_at(pos)?;
 
-        let path = utils::family_path(pos, self.size);
+        let family_path = utils::family_path(pos, self.size);
 
-        let path = path
+        let mut path = family_path
             .iter()
             .filter_map(|x| self.store.hash_at(x.1).ok())
             .collect::<Vec<_>>();
+
+        let peak = if let Some(n) = family_path.last() {
+            n.0
+        } else {
+            pos
+        };
+
+        path.append(&mut self.peak_path(peak));
 
         Ok(MerkleProof {
             mmr_size: self.size,
@@ -184,17 +192,39 @@ where
         Ok((new, merkle_path))
     }
 
-    #[allow(dead_code)]
-    fn bag_rhs(&self, peak_pos: u64) -> Option<Hash> {
-        let right_peaks = utils::peaks(self.size)
+    /// Path with all peak hashes excluding the peak at `pos`.
+    fn peak_path(&self, pos: u64) -> Vec<Hash> {
+        let rhs = self.bag_lower_peaks(pos);
+
+        let mut path = utils::peaks(self.size)
             .into_iter()
-            .filter(|&x| x > peak_pos)
+            .filter(|&n| n < pos)
+            .filter_map(|n| self.store.hash_at(n).ok())
+            .collect::<Vec<_>>();
+
+        if let Some(rhs) = rhs {
+            path.push(rhs);
+        }
+
+        path.reverse();
+
+        path
+    }
+
+    /// Bag all the peaks 'lower' than the peak at `pos`.
+    ///
+    /// Peaks are ordered left to right. The leftmost peak is always the 'highest' peak.
+    /// Due to this oredering, a 'lower' peak will always have a **higher** index.
+    fn bag_lower_peaks(&self, pos: u64) -> Option<Hash> {
+        let peaks = utils::peaks(self.size)
+            .into_iter()
+            .filter(|&x| x > pos)
             .filter_map(|x| self.store.hash_at(x).ok());
 
-        let mut peak_hash = None;
+        let mut hash = None;
 
-        right_peaks.rev().for_each(|peak| {
-            peak_hash = match peak_hash {
+        peaks.rev().for_each(|peak| {
+            hash = match hash {
                 None => Some(peak),
                 Some(hash) => {
                     let h = (peak, hash).hash();
@@ -203,7 +233,7 @@ where
             }
         });
 
-        peak_hash
+        hash
     }
 }
 
@@ -311,7 +341,7 @@ mod tests {
     }
 
     #[test]
-    fn bag_rhs_works() {
+    fn bag_lower_peaks_works() {
         let mut s = VecStore::<E>::new();
         let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
 
@@ -320,7 +350,7 @@ mod tests {
             let _ = mmr.append(&n).unwrap();
         });
 
-        let hash = mmr.bag_rhs(3);
+        let hash = mmr.bag_lower_peaks(3);
         assert_eq!(None, hash);
 
         s = VecStore::<E>::new();
@@ -331,7 +361,7 @@ mod tests {
             let _ = mmr.append(&n).unwrap();
         });
 
-        let hash = mmr.bag_rhs(7).unwrap();
+        let hash = mmr.bag_lower_peaks(7).unwrap();
         assert_eq!("449f2e6ff457".to_string(), hash.to_string());
     }
 }

@@ -13,18 +13,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-//! Merkle-Mountain-Range errors
+//! Merkle proof store tests
 
-use thiserror::Error;
+use merkle_mountain_range::{Error, MerkleMountainRange, VecStore};
 
-#[derive(Error, Debug, PartialEq)]
-pub enum Error {
-    #[error("store error: `{0}`")]
-    Store(String),
-    #[error("validation error: `{0}`")]
-    Validate(String),
-    #[error("failed to parse string as hex: `{0}`")]
-    ParseHex(String),
-    #[error("merkle proof error: `{0}`")]
-    Proof(String),
+type E = Vec<u8>;
+
+#[test]
+fn non_existing_node() {
+    let mut s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+    let mut size = 0;
+
+    (0..=6u8).for_each(|i| {
+        let n = vec![i];
+        size = mmr.append(&n).unwrap();
+    });
+
+    let want = Error::Proof("not a leaf node at pos 7".to_string());
+    let res = mmr.proof(7);
+
+    assert_eq!(Err(want), res);
 }

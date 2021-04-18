@@ -15,8 +15,9 @@
 
 //! Merkle Proof for a MMR path
 
-use crate::Hash;
+use crate::{error::Error, utils, Hash, Hashable};
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct MerkleProof {
     pub mmr_size: u64,
     pub path: Vec<Hash>,
@@ -34,5 +35,21 @@ impl MerkleProof {
             mmr_size: 0,
             path: Vec::default(),
         }
+    }
+
+    /// Verfiy that `elem` is a MMR node at positon `pos` given the root hash `root`.
+    pub fn verify(&self, root: Hash, elem: &dyn Hashable, pos: u64) -> Result<bool, Error> {
+        let peaks = utils::peaks(self.mmr_size);
+        self.clone().do_verify(root, elem, pos, &peaks)
+    }
+
+    fn do_verify(
+        &mut self,
+        _root: Hash,
+        _elm: &dyn Hashable,
+        _pos: u64,
+        _peaks: &[u64],
+    ) -> Result<bool, Error> {
+        Ok(true)
     }
 }

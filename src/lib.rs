@@ -17,15 +17,20 @@
 
 use std::marker::PhantomData;
 
+use utils::is_leaf;
+
+pub use {
+    error::Error,
+    hash::{Hash, Hashable},
+    proof::MerkleProof,
+    store::{Store, VecStore},
+};
+
 mod error;
 mod hash;
 mod proof;
 mod store;
 mod utils;
-
-pub use error::Error;
-pub use hash::{Hash, Hashable};
-pub use store::{Store, VecStore};
 
 /// Merkle Mountain Range (MMR) implementation.
 ///
@@ -119,6 +124,27 @@ where
         }
 
         Ok(true)
+    }
+
+    /// Return a MMR membership proof for a leaf node at position `pos`.
+    pub fn proof(&self, pos: u64) -> Result<MerkleProof, Error> {
+        if !is_leaf(pos) {
+            return Err(Error::Proof(format!("not a leaf node at pos {}", pos)));
+        }
+
+        self.store.hash_at(pos)?;
+
+        let path = utils::family_path(pos, self.size);
+
+        let path = path
+            .iter()
+            .filter_map(|x| self.store.hash_at(x.1).ok())
+            .collect::<Vec<_>>();
+
+        Ok(MerkleProof {
+            mmr_size: self.size,
+            path,
+        })
     }
 
     /// Calculate a single MMR root by 'bagging the peaks'.

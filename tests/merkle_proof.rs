@@ -35,3 +35,19 @@ fn non_existing_node() {
 
     assert_eq!(Err(want), res);
 }
+
+#[test]
+fn minimal_mmr() {
+    let mut s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+    let mut size = 0;
+
+    (0..=1u8).for_each(|i| {
+        let n = vec![i];
+        size = mmr.append(&n).unwrap();
+    });
+
+    let res = mmr.proof(2);
+
+    assert_eq!(res, res);
+}

@@ -194,16 +194,17 @@ where
 
     /// Path with all peak hashes excluding the peak at `pos`.
     fn peak_path(&self, pos: u64) -> Vec<Hash> {
-        let rhs = self.bag_lower_peaks(pos);
+        let lower = self.bag_lower_peaks(pos);
 
+        // path with higher peaks, if there are any
         let mut path = utils::peaks(self.size)
             .into_iter()
             .filter(|&n| n < pos)
             .filter_map(|n| self.store.hash_at(n).ok())
             .collect::<Vec<_>>();
 
-        if let Some(rhs) = rhs {
-            path.push(rhs);
+        if let Some(lower) = lower {
+            path.push(lower);
         }
 
         path.reverse();
@@ -363,5 +364,19 @@ mod tests {
 
         let hash = mmr.bag_lower_peaks(7).unwrap();
         assert_eq!("449f2e6ff457".to_string(), hash.to_string());
+    }
+
+    #[test]
+    fn peak_path_works() {
+        let mut s = VecStore::<E>::new();
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+
+        (0..=2u8).for_each(|i| {
+            let n = vec![i];
+            let _ = mmr.append(&n).unwrap();
+        });
+
+        let path = mmr.peak_path(4);
+        assert_eq!("2506b31b8538".to_string(), path[0].to_string());
     }
 }

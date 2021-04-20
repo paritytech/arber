@@ -376,7 +376,9 @@ mod tests {
             let _ = mmr.append(&n).unwrap();
         });
 
+        let want = mmr.store.hashes[3];
         let path = mmr.peak_path(4);
-        assert_eq!("2506b31b8538".to_string(), path[0].to_string());
+
+        assert_eq!(want, path[0]);
     }
 }

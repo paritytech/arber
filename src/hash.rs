@@ -145,9 +145,21 @@ where
     }
 }
 
+#[allow(dead_code)]
+/// Return the hash of `idx` and `hash`.
+///
+/// This function is used to avoid collisions among leaf data hashes themselves.
+pub fn hash_with_index(idx: u64, hash: &Hash) -> Hash {
+    let mut h = Blake2b::new();
+    h.update(idx.to_le_bytes());
+    h.update(hash);
+    let v = h.finalize();
+    Hash::from_vec(&v)
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{Error, Hash, Hashable};
+    use super::{hash_with_index, Error, Hash, Hashable};
 
     #[test]
     fn from_vec_works() {
@@ -231,5 +243,18 @@ mod tests {
         assert_eq!(h1, h2);
         assert_ne!(h1, h3);
         assert_ne!(h2, h3);
+    }
+
+    #[test]
+    fn hash_with_index_works() {
+        let h1 = vec![1u8; 10].hash();
+        let h2 = vec![1u8; 10].hash();
+
+        assert_eq!(h1, h2);
+
+        let h3 = hash_with_index(1, &h1);
+        let h4 = hash_with_index(2, &h2);
+
+        assert_ne!(h3, h4);
     }
 }

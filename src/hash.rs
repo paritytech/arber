@@ -161,6 +161,18 @@ pub fn hash_with_index(idx: u64, hash: &Hash) -> Hash {
 mod tests {
     use super::{hash_with_index, Error, Hash, Hashable};
 
+    macro_rules! hash_two {
+        ($a:expr, $b:expr) => {{
+            use blake2::{Blake2b, Digest};
+
+            let mut h = Blake2b::new();
+            h.update($a);
+            h.update($b);
+            let v = h.finalize();
+            Hash::from_vec(&v)
+        }};
+    }
+
     #[test]
     fn from_vec_works() {
         let v = vec![1, 2, 3];
@@ -243,6 +255,21 @@ mod tests {
         assert_eq!(h1, h2);
         assert_ne!(h1, h3);
         assert_ne!(h2, h3);
+    }
+
+    #[test]
+    fn hash_two_works() {
+        let h1 = hash_two!(1u64.to_le_bytes(), vec![0u8; 10]);
+        let h2 = (1u64, vec![0u8; 10]).hash();
+
+        assert_ne!(h1, h2);
+
+        let h1 = 1u64.hash();
+        let h2 = vec![0u8; 10].hash();
+        let h3 = hash_two!(h1, h2);
+        let h4 = (h1, h2).hash();
+
+        assert_eq!(h3, h4);
     }
 
     #[test]

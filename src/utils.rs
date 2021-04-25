@@ -237,24 +237,24 @@ mod tests {
 
     #[test]
     fn is_leaf_works() {
-        assert_eq!(is_leaf(0), true);
-        assert_eq!(is_leaf(1), true);
-        assert_eq!(is_leaf(2), true);
-        assert_eq!(is_leaf(3), false);
-        assert_eq!(is_leaf(4), true);
-        assert_eq!(is_leaf(5), true);
-        assert_eq!(is_leaf(6), false);
-        assert_eq!(is_leaf(7), false);
-        assert_eq!(is_leaf(8), true);
-        assert_eq!(is_leaf(10), false);
-        assert_eq!(is_leaf(15), false);
-        assert_eq!(is_leaf(16), true);
-        assert_eq!(is_leaf(18), false);
-        assert_eq!(is_leaf(19), true);
-        assert_eq!(is_leaf(28), false);
-        assert_eq!(is_leaf(29), false);
-        assert_eq!(is_leaf(30), false);
-        assert_eq!(is_leaf(31), false);
+        assert!(is_leaf(0));
+        assert!(is_leaf(1));
+        assert!(is_leaf(2));
+        assert!(!is_leaf(3));
+        assert!(is_leaf(4));
+        assert!(is_leaf(5));
+        assert!(!is_leaf(6));
+        assert!(!is_leaf(7));
+        assert!(is_leaf(8));
+        assert!(!is_leaf(10));
+        assert!(!is_leaf(15));
+        assert!(is_leaf(16));
+        assert!(!is_leaf(18));
+        assert!(is_leaf(19));
+        assert!(!is_leaf(28));
+        assert!(!is_leaf(29));
+        assert!(!is_leaf(30));
+        assert!(!is_leaf(31));
     }
 
     #[test]

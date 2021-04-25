@@ -21,7 +21,7 @@ use utils::is_leaf;
 
 pub use {
     error::Error,
-    hash::{Hash, Hashable},
+    hash::{hash_with_index, Hash, Hashable},
     proof::MerkleProof,
     store::{Store, VecStore},
 };
@@ -71,7 +71,7 @@ where
     /// Append `elem` to the MMR. Return new MMR size.
     pub fn append(&mut self, elem: &T) -> Result<u64, Error> {
         let idx = self.size;
-        let node_hash = (idx, elem.clone()).hash();
+        let node_hash = hash_with_index(idx, &elem.clone().hash());
 
         let (peak_map, node_height) = utils::peak_height_map(idx);
 
@@ -109,7 +109,7 @@ where
                 let right_hash = self.store.hash_at(right_idx)?;
 
                 let tmp = (left_hash, right_hash).hash();
-                let tmp = (idx, tmp).hash();
+                let tmp = hash_with_index(idx, &tmp);
 
                 // check against expected parent hash
                 let parent_hash = self.store.hash_at(idx)?;
@@ -182,7 +182,7 @@ where
             idx += 1; // idx for new peak
 
             peak_hash = (left_hash, peak_hash).hash();
-            peak_hash = (idx, peak_hash).hash();
+            peak_hash = hash_with_index(idx, &peak_hash);
             merkle_path.push(peak_hash);
 
             height *= 2; // next power of 2
@@ -318,7 +318,7 @@ mod tests {
             let _ = mmr.append(&n).unwrap();
         });
 
-        let want = Error::Validate("idx 2: 000000000000 != 1a5b9c214809".to_string());
+        let want = Error::Validate("idx 2: 000000000000 != 9f7d5dc4ed82".to_string());
 
         mmr.store.hashes[2] = Hash::from_hex("0x00").unwrap();
         let got = mmr.validate().err().unwrap();
@@ -333,7 +333,7 @@ mod tests {
             let _ = mmr.append(&n).unwrap();
         });
 
-        let want = Error::Validate("idx 6: 000000000000 != 7ddd7eb278f9".to_string());
+        let want = Error::Validate("idx 6: 000000000000 != 2cabe06f9728".to_string());
 
         mmr.store.hashes[6] = Hash::from_hex("0x00").unwrap();
         let got = mmr.validate().err().unwrap();
@@ -363,7 +363,7 @@ mod tests {
         });
 
         let hash = mmr.bag_lower_peaks(7).unwrap();
-        assert_eq!("449f2e6ff457".to_string(), hash.to_string());
+        assert_eq!("37898bbb05e1".to_string(), hash.to_string());
     }
 
     #[test]

@@ -146,7 +146,6 @@ where
     }
 }
 
-#[allow(dead_code)]
 /// Return the hash of `idx` and `hash`.
 ///
 /// This function is used to avoid collisions among leaf data hashes themselves.

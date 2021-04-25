@@ -126,6 +126,7 @@ impl Hashable for u64 {
 }
 
 impl Hashable for Hash {
+    /// Return the hash, without hashing again.
     fn hash(&self) -> Hash {
         *self
     }
@@ -279,9 +280,12 @@ mod tests {
 
         assert_eq!(h1, h2);
 
-        let h3 = hash_with_index(1, &h1);
-        let h4 = hash_with_index(2, &h2);
+        let want = hash_two!(1u64.to_le_bytes(), &h1);
+        let got = hash_with_index(1, &h1);
+        assert_eq!(want, got);
 
-        assert_ne!(h3, h4);
+        let want = hash_two!(2u64.to_le_bytes(), &h2);
+        let got = hash_with_index(2, &h2);
+        assert_eq!(want, got);
     }
 }

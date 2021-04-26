@@ -15,7 +15,7 @@
 
 //! Merkle Proof for a MMR path
 
-use crate::{error::Error, utils, Hash, Hashable};
+use crate::{error::Error, hash_with_index, utils, Hash, Hashable};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MerkleProof {
@@ -45,11 +45,26 @@ impl MerkleProof {
 
     fn do_verify(
         &mut self,
-        _root: Hash,
-        _elm: &dyn Hashable,
-        _pos: u64,
+        root: Hash,
+        elem: &dyn Hashable,
+        pos: u64,
         _peaks: &[u64],
     ) -> Result<bool, Error> {
-        Ok(true)
+        let hash = if pos > self.mmr_size {
+            hash_with_index(self.mmr_size, &elem.hash())
+        } else {
+            hash_with_index(pos - 1, &elem.hash())
+        };
+
+        // MMR has only a single node
+        if self.path.is_empty() {
+            if root == hash {
+                return Ok(true);
+            } else {
+                return Err(Error::Proof(format!("root mismatch {} != {}", hash, root)));
+            }
+        }
+
+        Ok(false)
     }
 }

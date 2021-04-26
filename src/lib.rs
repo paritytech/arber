@@ -132,7 +132,7 @@ where
             return Err(Error::Proof(format!("not a leaf node at pos {}", pos)));
         }
 
-        self.store.hash_at(pos)?;
+        self.store.hash_at(pos - 1)?;
 
         let family_path = utils::family_path(pos, self.size);
 

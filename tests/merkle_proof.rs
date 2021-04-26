@@ -15,7 +15,7 @@
 
 //! Merkle proof store tests
 
-use merkle_mountain_range::{Error, MerkleMountainRange, VecStore};
+use merkle_mountain_range::{hash_with_index, Error, Hashable, MerkleMountainRange, VecStore};
 
 type E = Vec<u8>;
 
@@ -34,6 +34,26 @@ fn non_existing_node() {
     let res = mmr.proof(7);
 
     assert_eq!(Err(want), res);
+}
+
+#[test]
+fn single_node() {
+    let mut s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+
+    let node = vec![42u8];
+    let size = mmr.append(&node).unwrap();
+    let proof = mmr.proof(size).unwrap();
+
+    // this root hash is wrong because is has not been hashed with the node index
+    let root = node.hash();
+
+    let want = Error::Proof("root mismatch 8c058212512f != e00265169656".to_string());
+    let got = proof.verify(root, &node, size);
+    assert_eq!(Err(want), got);
+
+    let root = hash_with_index(0, &root);
+    assert!(proof.verify(root, &node, size).unwrap());
 }
 
 #[test]

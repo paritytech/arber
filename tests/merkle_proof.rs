@@ -21,8 +21,8 @@ type E = Vec<u8>;
 
 #[test]
 fn non_existing_node() {
-    let mut s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+    let s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
     let mut size = 0;
 
     (0..=6u8).for_each(|i| {
@@ -38,8 +38,8 @@ fn non_existing_node() {
 
 #[test]
 fn single_node() {
-    let mut s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+    let s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
     let node = vec![42u8];
     let size = mmr.append(&node).unwrap();
@@ -58,8 +58,8 @@ fn single_node() {
 
 #[test]
 fn minimal_mmr() {
-    let mut s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+    let s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
     let mut size = 0;
 
     (0..=1u8).for_each(|i| {
@@ -75,8 +75,8 @@ fn minimal_mmr() {
 
 #[test]
 fn verify_proof() {
-    let mut s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+    let s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
     let mut size = 0;
 
     (0..6u8).for_each(|i| {

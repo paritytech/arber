@@ -42,7 +42,7 @@ mod utils;
 ///
 /// Again, positions are '1' based tree node positions, indices are '0' based `Store`
 /// locations.
-pub struct MerkleMountainRange<'a, T, S>
+pub struct MerkleMountainRange<T, S>
 where
     T: Hashable + Clone,
     S: Store<T>,
@@ -50,17 +50,17 @@ where
     /// Total number of MMR nodes, i.e. MMR size
     pub size: u64,
     // backing store for the MMR
-    store: &'a mut S,
+    store: S,
     // make rustc happy
     _marker: PhantomData<T>,
 }
 
-impl<'a, T, S> MerkleMountainRange<'a, T, S>
+impl<'a, T, S> MerkleMountainRange<T, S>
 where
     T: Hashable + Clone,
     S: Store<T>,
 {
-    pub fn new(store: &'a mut S) -> Self {
+    pub fn new(store: S) -> Self {
         MerkleMountainRange {
             size: 0,
             store,
@@ -246,8 +246,8 @@ mod tests {
 
     #[test]
     fn append_two_nodes() {
-        let mut s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+        let s = VecStore::<E>::new();
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
         let n1 = vec![0u8, 10];
         let pos = mmr.append(&n1).unwrap();
@@ -262,8 +262,8 @@ mod tests {
 
     #[test]
     fn append_tree_nodes() {
-        let mut s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+        let s = VecStore::<E>::new();
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
         let n1 = vec![0u8, 10];
         let pos = mmr.append(&n1).unwrap();
@@ -283,8 +283,8 @@ mod tests {
 
     #[test]
     fn validate_works() {
-        let mut s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+        let s = VecStore::<E>::new();
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
         // empty MMR is valid
         assert!(mmr.validate().unwrap());
@@ -311,7 +311,7 @@ mod tests {
     #[test]
     fn validate_fails() {
         let mut s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
         (0..=2u8).for_each(|i| {
             let n = vec![i, 10];
@@ -326,7 +326,7 @@ mod tests {
         assert_eq!(want, got);
 
         s = VecStore::<E>::new();
-        mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+        mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
         (0..=6u8).for_each(|i| {
             let n = vec![i, 10];
@@ -344,7 +344,7 @@ mod tests {
     #[test]
     fn bag_lower_peaks_works() {
         let mut s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
         (0..=2u8).for_each(|i| {
             let n = vec![i, 10];
@@ -355,7 +355,7 @@ mod tests {
         assert_eq!(None, hash);
 
         s = VecStore::<E>::new();
-        mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+        mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
         (0..=6u8).for_each(|i| {
             let n = vec![i, 10];
@@ -368,8 +368,8 @@ mod tests {
 
     #[test]
     fn peak_path_works() {
-        let mut s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+        let s = VecStore::<E>::new();
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
         (0..=2u8).for_each(|i| {
             let n = vec![i];

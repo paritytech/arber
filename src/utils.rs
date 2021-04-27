@@ -123,6 +123,13 @@ pub(crate) fn peak_height_map(mut idx: u64) -> (u64, u64) {
     (peak_map, idx)
 }
 
+/// Is the node at `pos` the left child node of its parent.
+pub(crate) fn is_left(pos: u64) -> bool {
+    let (peak_map, node_height) = peak_height_map(pos - 1);
+    let peak = 1 << node_height;
+    (peak_map & peak) == 0
+}
+
 /// For a given node at position `pos` calculate the parent and sibling positions
 ///  for a path up to the `end_pos` node. This `family_path` will contain the nodes
 /// needed in order to generate a membership Merkle proof for the node at `pos`.
@@ -181,7 +188,7 @@ pub(crate) fn family_path(pos: u64, end_pos: u64) -> Vec<(u64, u64)> {
 
 #[cfg(test)]
 mod tests {
-    use super::{family_path, is_leaf, node_height, peak_height_map, peaks};
+    use super::{family_path, is_leaf, is_left, node_height, peak_height_map, peaks};
 
     #[test]
     fn peaks_works() {
@@ -272,6 +279,25 @@ mod tests {
         // test edge cases
         assert_eq!(peak_height_map(u64::MAX), ((u64::MAX >> 1) + 1, 0));
         assert_eq!(peak_height_map(u64::MAX - 1), (u64::MAX >> 1, 63));
+    }
+
+    #[test]
+    fn is_left_works() {
+        assert!(is_left(1));
+        assert!(!is_left(2));
+        assert!(is_left(3));
+        assert!(is_left(4));
+        assert!(!is_left(5));
+        assert!(!is_left(6));
+        assert!(is_left(7));
+        assert!(is_left(8));
+        assert!(!is_left(9));
+        assert!(is_left(10));
+        assert!(is_left(11));
+        assert!(!is_left(12));
+        assert!(!is_left(13));
+        assert!(!is_left(14));
+        assert!(is_left(15));
     }
 
     #[test]

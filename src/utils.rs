@@ -130,6 +130,22 @@ pub(crate) fn is_left(pos: u64) -> bool {
     (peak_map & peak) == 0
 }
 
+/// For a node at `pos`, calculate the positions of its parent and sibling.
+/// Sibling might either be the left or right one, depending on which is
+/// missing.
+///
+/// The family is returned as a tuple of the form `(parent, sibling)`.
+pub(crate) fn family(pos: u64) -> (u64, u64) {
+    let (peak_map, node_height) = peak_height_map(pos - 1);
+    let peak = 1 << node_height;
+
+    if (peak_map & peak) != 0 {
+        (pos + 1, pos + 1 - 2 * peak)
+    } else {
+        (pos + 2 * peak, pos + 2 * peak - 1)
+    }
+}
+
 /// For a given node at position `pos` calculate the parent and sibling positions
 ///  for a path up to the `end_pos` node. This `family_path` will contain the nodes
 /// needed in order to generate a membership Merkle proof for the node at `pos`.
@@ -188,7 +204,7 @@ pub(crate) fn family_path(pos: u64, end_pos: u64) -> Vec<(u64, u64)> {
 
 #[cfg(test)]
 mod tests {
-    use super::{family_path, is_leaf, is_left, node_height, peak_height_map, peaks};
+    use super::{family, family_path, is_leaf, is_left, node_height, peak_height_map, peaks};
 
     #[test]
     fn peaks_works() {
@@ -298,6 +314,29 @@ mod tests {
         assert!(!is_left(13));
         assert!(!is_left(14));
         assert!(is_left(15));
+    }
+
+    #[test]
+    fn family_works() {
+        let f = family(1);
+        assert_eq!(f, (3, 2));
+        let f = family(2);
+        assert_eq!(f, (3, 1));
+
+        let f = family(3);
+        assert_eq!(f, (7, 6));
+        let f = family(6);
+        assert_eq!(f, (7, 3));
+
+        let f = family(7);
+        assert_eq!(f, (15, 14));
+        let f = family(14);
+        assert_eq!(f, (15, 7));
+
+        let f = family(11);
+        assert_eq!(f, (13, 12));
+        let f = family(12);
+        assert_eq!(f, (13, 11));
     }
 
     #[test]

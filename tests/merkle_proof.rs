@@ -72,3 +72,18 @@ fn minimal_mmr() {
 
     assert_eq!("c3264807b084", got);
 }
+
+#[test]
+fn verify_proof() {
+    let mut s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(&mut s);
+    let mut size = 0;
+
+    (0..6u8).for_each(|i| {
+        let n = vec![i];
+        size = mmr.append(&n).unwrap();
+    });
+
+    let proof = mmr.proof(4).unwrap();
+    assert_eq!(2, proof.path.len());
+}

@@ -48,7 +48,7 @@ impl MerkleProof {
         root: Hash,
         elem: &dyn Hashable,
         pos: u64,
-        _peaks: &[u64],
+        peaks: &[u64],
     ) -> Result<bool, Error> {
         let hash = if pos > self.mmr_size {
             hash_with_index(self.mmr_size, &elem.hash())
@@ -65,6 +65,26 @@ impl MerkleProof {
             }
         }
 
-        Ok(false)
+        let sibling = self.path.remove(0);
+        let (parent_pos, sibling_pos) = utils::family(pos);
+
+        if let Ok(x) = peaks.binary_search(&pos) {
+            let parent = if x == peaks.len() - 1 {
+                (sibling, hash)
+            } else {
+                (hash, sibling)
+            };
+            self.verify(root, &parent, parent_pos)
+        } else if parent_pos > self.mmr_size {
+            let parent = (sibling, hash);
+            self.verify(root, &parent, parent_pos)
+        } else {
+            let parent = if utils::is_left(sibling_pos) {
+                (sibling, hash)
+            } else {
+                (hash, sibling)
+            };
+            self.verify(root, &parent, parent_pos)
+        }
     }
 }

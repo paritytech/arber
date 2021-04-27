@@ -244,6 +244,18 @@ mod tests {
 
     type E = Vec<u8>;
 
+    fn make_mmr(size: u8) -> MerkleMountainRange<E, VecStore<E>> {
+        let s = VecStore::<E>::new();
+        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+
+        (0..=size).for_each(|i| {
+            let n = vec![i, 10];
+            let _ = mmr.append(&n).unwrap();
+        });
+
+        mmr
+    }
+
     #[test]
     fn append_two_nodes() {
         let s = VecStore::<E>::new();
@@ -310,13 +322,7 @@ mod tests {
 
     #[test]
     fn validate_fails() {
-        let mut s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
-
-        (0..=2u8).for_each(|i| {
-            let n = vec![i, 10];
-            let _ = mmr.append(&n).unwrap();
-        });
+        let mut mmr = make_mmr(2);
 
         let want = Error::Validate("idx 2: 000000000000 != 9f7d5dc4ed82".to_string());
 
@@ -325,13 +331,7 @@ mod tests {
 
         assert_eq!(want, got);
 
-        s = VecStore::<E>::new();
-        mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
-
-        (0..=6u8).for_each(|i| {
-            let n = vec![i, 10];
-            let _ = mmr.append(&n).unwrap();
-        });
+        let mut mmr = make_mmr(6);
 
         let want = Error::Validate("idx 6: 000000000000 != 2cabe06f9728".to_string());
 
@@ -343,24 +343,12 @@ mod tests {
 
     #[test]
     fn bag_lower_peaks_works() {
-        let mut s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
-
-        (0..=2u8).for_each(|i| {
-            let n = vec![i, 10];
-            let _ = mmr.append(&n).unwrap();
-        });
+        let mmr = make_mmr(2);
 
         let hash = mmr.bag_lower_peaks(3);
         assert_eq!(None, hash);
 
-        s = VecStore::<E>::new();
-        mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
-
-        (0..=6u8).for_each(|i| {
-            let n = vec![i, 10];
-            let _ = mmr.append(&n).unwrap();
-        });
+        let mmr = make_mmr(6);
 
         let hash = mmr.bag_lower_peaks(7).unwrap();
         assert_eq!("37898bbb05e1".to_string(), hash.to_string());
@@ -368,13 +356,7 @@ mod tests {
 
     #[test]
     fn peak_path_works() {
-        let s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
-
-        (0..=2u8).for_each(|i| {
-            let n = vec![i];
-            let _ = mmr.append(&n).unwrap();
-        });
+        let mmr = make_mmr(2);
 
         let want = mmr.store.hashes[3];
         let path = mmr.peak_path(4);

@@ -155,6 +155,14 @@ where
         })
     }
 
+    /// Return node hash at `pos`.
+    ///
+    /// Note that in case of an error, [`Error::Store`] is returned and the error
+    /// message is referring to `pss - 1`, i.e. an index.
+    pub fn hash(&self, pos: u64) -> Result<Hash, Error> {
+        self.store.hash_at(pos.saturating_sub(1))
+    }
+
     /// Calculate a single MMR root by 'bagging the peaks'.
     ///
     /// Return the number of new nodes added as well as a merkle path to the MMR root.
@@ -362,5 +370,21 @@ mod tests {
         let path = mmr.peak_path(4);
 
         assert_eq!(want, path[0]);
+    }
+
+    #[test]
+    fn hash_error_works() {
+        let s = VecStore::<E>::new();
+        let mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+
+        let want = Error::Store("missing hash at: 0".to_string());
+        let got = mmr.hash(0).err().unwrap();
+
+        assert_eq!(want, got);
+
+        let want = Error::Store("missing hash at: 2".to_string());
+        let got = mmr.hash(3).err().unwrap();
+
+        assert_eq!(want, got);
     }
 }

@@ -254,11 +254,11 @@ mod tests {
 
     type E = Vec<u8>;
 
-    fn make_mmr(size: u8) -> MerkleMountainRange<E, VecStore<E>> {
+    fn make_mmr(num_leafs: u8) -> MerkleMountainRange<E, VecStore<E>> {
         let s = VecStore::<E>::new();
         let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
-        (0..=size.saturating_sub(1)).for_each(|i| {
+        (0..=num_leafs.saturating_sub(1)).for_each(|i| {
             let n = vec![i, 10];
             let _ = mmr.append(&n).unwrap();
         });

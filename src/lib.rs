@@ -228,7 +228,7 @@ where
         let peaks = utils::peaks(self.size)
             .into_iter()
             .filter(|&x| x > pos)
-            .filter_map(|x| self.store.hash_at(x).ok());
+            .filter_map(|x| self.hash(x).ok());
 
         let mut hash = None;
 
@@ -237,7 +237,7 @@ where
                 None => Some(peak),
                 Some(hash) => {
                     let h = (peak, hash).hash();
-                    Some((self.size, h).hash())
+                    Some(hash_with_index(self.size, &h))
                 }
             }
         });
@@ -353,15 +353,25 @@ mod tests {
 
     #[test]
     fn bag_lower_peaks_works() {
-        let mmr = make_mmr(3);
+        let mmr = make_mmr(2);
+        let got = mmr.bag_lower_peaks(3);
 
-        let hash = mmr.bag_lower_peaks(3);
-        assert_eq!(None, hash);
+        assert_eq!(None, got);
+
+        let mmr = make_mmr(3);
+        let want = mmr.hash(4).unwrap();
+        let got = mmr.bag_lower_peaks(3).unwrap();
+
+        assert_eq!(want, got);
 
         let mmr = make_mmr(7);
+        let h1 = mmr.hash(10).unwrap();
+        let h2 = mmr.hash(11).unwrap();
+        let want = (h1, h2).hash();
+        let want = hash_with_index(mmr.size, &want);
+        let got = mmr.bag_lower_peaks(7).unwrap();
 
-        let hash = mmr.bag_lower_peaks(7).unwrap();
-        assert_eq!("37898bbb05e1".to_string(), hash.to_string());
+        assert_eq!(want, got);
     }
 
     #[test]

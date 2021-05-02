@@ -85,5 +85,5 @@ fn verify_proof() {
     });
 
     let proof = mmr.proof(4).unwrap();
-    assert_eq!(2, proof.path.len());
+    assert_eq!(3, proof.path.len());
 }

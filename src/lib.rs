@@ -201,6 +201,9 @@ where
     }
 
     /// Path with all peak hashes excluding the peak at `pos`.
+    ///
+    /// The returned path vector will contain the peak hashes from rigth to left,
+    /// i.e. from the lowest to the highest peak.
     fn peak_path(&self, pos: u64) -> Vec<Hash> {
         let lower = self.bag_lower_peaks(pos);
 
@@ -208,7 +211,7 @@ where
         let mut path = utils::peaks(self.size)
             .into_iter()
             .filter(|&n| n < pos)
-            .filter_map(|n| self.store.hash_at(n).ok())
+            .filter_map(|n| self.hash(n).ok())
             .collect::<Vec<_>>();
 
         if let Some(lower) = lower {
@@ -376,12 +379,47 @@ mod tests {
 
     #[test]
     fn peak_path_works() {
+        let mmr = make_mmr(2);
+        let path = mmr.peak_path(3);
+
+        assert!(path.is_empty());
+
         let mmr = make_mmr(3);
+        let want = mmr.hash(4).unwrap();
+        let want = vec![want];
+        let got = mmr.peak_path(3);
 
-        let want = mmr.store.hashes[3];
-        let path = mmr.peak_path(4);
+        assert_eq!(want, got);
 
-        assert_eq!(want, path[0]);
+        let want = mmr.hash(3).unwrap();
+        let want = vec![want];
+        let got = mmr.peak_path(4);
+
+        assert_eq!(want, got);
+
+        let mmr = make_mmr(7);
+        let h1 = mmr.hash(10).unwrap();
+        let h2 = mmr.hash(7).unwrap();
+        let want = vec![h1, h2];
+        let got = mmr.peak_path(11);
+
+        assert_eq!(want, got);
+
+        let h1 = mmr.hash(11).unwrap();
+        let h2 = mmr.hash(7).unwrap();
+        let want = vec![h1, h2];
+        let got = mmr.peak_path(10);
+
+        assert_eq!(want, got);
+
+        let h1 = mmr.hash(11).unwrap();
+        let h2 = mmr.hash(10).unwrap();
+        let want = (h2, h1).hash();
+        let want = hash_with_index(mmr.size, &want);
+        let want = vec![want];
+        let got = mmr.peak_path(7);
+
+        assert_eq!(want, got);
     }
 
     #[test]

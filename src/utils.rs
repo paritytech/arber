@@ -18,18 +18,22 @@
 /// 64-bit all being binary ones: 0b1111111...1
 const ALL_ONES: u64 = u64::MAX;
 
-/// Return the indices for all peaks given a MMR with `size` nodes.
+/// Return the positions for all peaks given a MMR with `size` nodes.
 ///
 /// Peaks are listed left to right, starting with the leftmost peak. The leftmost
 /// peak is also always the 'highest' peak.
 ///
-/// Note that for an 'unstable' MMR, the result vector will be empty! We denote
-/// a MMR as unstable if the given number of nodes would lead to two leaf nodes.
+/// Note that for an 'unstable' MMR, the result vector will be empty!
+///
+/// We denote a MMR as unstable if the given number of nodes would lead to two leaf
+/// nodes. Two inner nodes at the same height without a parent will also result in
+/// an unstable MMR.
+///
 /// For example, the MMR below with `size = 5` is unstable.
 /// ```no
-///    2
+///    3
 ///   / \
-///  0   1   3   4
+///  1   2   4   5
 /// ```
 pub(crate) fn peaks(size: u64) -> Vec<u64> {
     if size == 0 {

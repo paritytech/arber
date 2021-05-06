@@ -355,6 +355,16 @@ mod tests {
     }
 
     #[test]
+    fn proof_fails() {
+        let mmr = make_mmr(2);
+
+        let want = Error::Proof("not a leaf node at pos 3".to_string());
+        let got = mmr.proof(3).err().unwrap();
+
+        assert_eq!(want, got);
+    }
+
+    #[test]
     fn bag_lower_peaks_works() {
         let mmr = make_mmr(2);
         let got = mmr.bag_lower_peaks(3);

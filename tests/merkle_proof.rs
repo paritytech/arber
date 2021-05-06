@@ -19,16 +19,21 @@ use merkle_mountain_range::{hash_with_index, Error, Hashable, MerkleMountainRang
 
 type E = Vec<u8>;
 
-#[test]
-fn non_existing_node() {
+fn make_mmr(num_leafs: u8) -> MerkleMountainRange<E, VecStore<E>> {
     let s = VecStore::<E>::new();
     let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
-    let mut size = 0;
 
-    (0..=6u8).for_each(|i| {
+    (0..=num_leafs.saturating_sub(1)).for_each(|i| {
         let n = vec![i];
-        size = mmr.append(&n).unwrap();
+        let _ = mmr.append(&n).unwrap();
     });
+
+    mmr
+}
+
+#[test]
+fn non_existing_node() {
+    let mmr = make_mmr(7);
 
     let want = Error::Proof("not a leaf node at pos 7".to_string());
     let res = mmr.proof(7);
@@ -58,34 +63,19 @@ fn single_node() {
 
 #[test]
 fn minimal_mmr() {
-    let s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
-    let mut size = 0;
-
-    (0..=1u8).for_each(|i| {
-        let n = vec![i];
-        size = mmr.append(&n).unwrap();
-    });
-
+    let mmr = make_mmr(2);
     let proof = mmr.proof(2).unwrap();
 
     assert!(proof
-        .verify(mmr.hash(size).unwrap(), &vec![1u8], 2)
+        .verify(mmr.hash(mmr.size).unwrap(), &vec![1u8], 2)
         .unwrap(),);
 }
 
 #[test]
 fn verify_proof() {
-    let s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
-    let mut size = 0;
-
-    (0..3u8).for_each(|i| {
-        let n = vec![i];
-        size = mmr.append(&n).unwrap();
-    });
-
+    let mmr = make_mmr(4);
     let proof = mmr.proof(4).unwrap();
 
-    assert_eq!(1, proof.path.len());
+    assert_eq!(7, proof.mmr_size);
+    assert_eq!(2, proof.path.len());
 }

@@ -132,13 +132,13 @@ where
             return Err(Error::Proof(format!("not a leaf node at pos {}", pos)));
         }
 
-        self.store.hash_at(pos - 1)?;
+        self.hash(pos)?;
 
         let family_path = utils::family_path(pos, self.size);
 
         let mut path = family_path
             .iter()
-            .filter_map(|x| self.store.hash_at(x.1).ok())
+            .filter_map(|x| self.hash(x.1).ok())
             .collect::<Vec<_>>();
 
         let peak = if let Some(n) = family_path.last() {
@@ -362,6 +362,39 @@ mod tests {
         let got = mmr.proof(3).err().unwrap();
 
         assert_eq!(want, got);
+    }
+
+    #[test]
+    fn proof_works() {
+        let mmr = make_mmr(2);
+        let proof = mmr.proof(1).unwrap();
+
+        assert_eq!(3, proof.mmr_size);
+        assert_eq!(1, proof.path.len());
+        assert_eq!(mmr.hash(2).unwrap(), proof.path[0]);
+
+        let mmr = make_mmr(4);
+        let proof = mmr.proof(4).unwrap();
+
+        assert_eq!(7, proof.mmr_size);
+        assert_eq!(2, proof.path.len());
+        assert_eq!(mmr.hash(5).unwrap(), proof.path[0]);
+        assert_eq!(mmr.hash(3).unwrap(), proof.path[1]);
+
+        let mmr = make_mmr(11);
+        let proof = mmr.proof(5).unwrap();
+
+        assert_eq!(19, proof.mmr_size);
+        assert_eq!(4, proof.path.len());
+        assert_eq!(mmr.hash(4).unwrap(), proof.path[0]);
+        assert_eq!(mmr.hash(3).unwrap(), proof.path[1]);
+        assert_eq!(mmr.hash(14).unwrap(), proof.path[2]);
+
+        let h1 = mmr.hash(18).unwrap();
+        let h2 = mmr.hash(19).unwrap();
+        let h = (h1, h2).hash();
+        let h = hash_with_index(mmr.size, &h);
+        assert_eq!(h, proof.path[3]);
     }
 
     #[test]

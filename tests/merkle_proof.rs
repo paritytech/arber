@@ -67,10 +67,9 @@ fn minimal_mmr() {
         size = mmr.append(&n).unwrap();
     });
 
-    let got = mmr.proof(2).unwrap().path[0];
-    let got = format!("{}", got);
+    let proof = mmr.proof(2).unwrap();
 
-    assert_eq!("c3264807b084", got);
+    assert_eq!(mmr.hash(1).unwrap(), proof.path[0]);
 }
 
 #[test]

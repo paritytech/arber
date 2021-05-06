@@ -69,7 +69,9 @@ fn minimal_mmr() {
 
     let proof = mmr.proof(2).unwrap();
 
-    assert_eq!(mmr.hash(1).unwrap(), proof.path[0]);
+    assert!(proof
+        .verify(mmr.hash(size).unwrap(), &vec![1u8], 2)
+        .unwrap(),);
 }
 
 #[test]
@@ -78,11 +80,12 @@ fn verify_proof() {
     let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
     let mut size = 0;
 
-    (0..6u8).for_each(|i| {
+    (0..3u8).for_each(|i| {
         let n = vec![i];
         size = mmr.append(&n).unwrap();
     });
 
     let proof = mmr.proof(4).unwrap();
-    assert_eq!(3, proof.path.len());
+
+    assert_eq!(1, proof.path.len());
 }

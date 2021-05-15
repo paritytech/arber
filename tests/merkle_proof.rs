@@ -68,14 +68,18 @@ fn minimal_mmr() {
 
     assert!(proof
         .verify(mmr.hash(mmr.size).unwrap(), &vec![1u8], 2)
-        .unwrap(),);
+        .unwrap());
 }
 
 #[test]
-fn verify_proof() {
+fn verify_proof_single_peak() {
     let mmr = make_mmr(4);
-    let proof = mmr.proof(4).unwrap();
+    let proof = mmr.proof(5).unwrap();
 
     assert_eq!(7, proof.mmr_size);
     assert_eq!(2, proof.path.len());
+
+    assert!(proof
+        .verify(mmr.hash(mmr.size).unwrap(), &vec![3u8], 5)
+        .unwrap());
 }

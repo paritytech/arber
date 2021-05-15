@@ -83,3 +83,12 @@ fn verify_proof_single_peak() {
         .verify(mmr.hash(mmr.size).unwrap(), &vec![3u8], 5)
         .unwrap());
 }
+
+#[test]
+fn verify_proof_two_peaks() {
+    let mmr = make_mmr(6);
+    let proof = mmr.proof(8).unwrap();
+
+    assert_eq!(10, proof.mmr_size);
+    assert_eq!(2, proof.path.len());
+}

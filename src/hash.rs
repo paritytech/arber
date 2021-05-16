@@ -42,6 +42,9 @@ macro_rules! to_hex {
 #[derive(Copy, Clone, PartialEq)]
 pub struct Hash([u8; 32]);
 
+/// A hash consisting of all zeros.
+pub const ZERO_HASH: Hash = Hash([0; 32]);
+
 impl fmt::Debug for Hash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         const DISP_SIZE: usize = 12;

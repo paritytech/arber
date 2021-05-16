@@ -164,7 +164,7 @@ where
     }
 
     /// Return MMR peaks as a vec
-    fn peaks(&self) -> Vec<Hash> {
+    pub fn peaks(&self) -> Vec<Hash> {
         utils::peaks(self.size)
             .into_iter()
             .filter_map(move |p| self.store.peak_hash_at(p.saturating_sub(1)).ok())
@@ -529,5 +529,41 @@ mod tests {
         let h3 = hash_with_index(5, &(h1, h2).hash());
         let h = mmr.hash(6).unwrap();
         assert_eq!(h, h3);
+    }
+
+    #[test]
+    fn peaks_works() {
+        let mmr = make_mmr(1);
+        let peaks = mmr.peaks();
+
+        assert!(peaks.len() == 1);
+        assert_eq!(mmr.hash(mmr.size).unwrap(), peaks[0]);
+
+        let mmr = make_mmr(2);
+        let peaks = mmr.peaks();
+
+        assert!(peaks.len() == 1);
+        assert_eq!(mmr.hash(mmr.size).unwrap(), peaks[0]);
+
+        let mmr = make_mmr(4);
+        let peaks = mmr.peaks();
+
+        assert!(peaks.len() == 1);
+        assert_eq!(mmr.hash(mmr.size).unwrap(), peaks[0]);
+
+        let mmr = make_mmr(10);
+        let peaks = mmr.peaks();
+
+        assert!(peaks.len() == 2);
+        assert_eq!(mmr.hash(15).unwrap(), peaks[0]);
+        assert_eq!(mmr.hash(18).unwrap(), peaks[1]);
+
+        let mmr = make_mmr(11);
+        let peaks = mmr.peaks();
+
+        assert!(peaks.len() == 3);
+        assert_eq!(mmr.hash(15).unwrap(), peaks[0]);
+        assert_eq!(mmr.hash(18).unwrap(), peaks[1]);
+        assert_eq!(mmr.hash(19).unwrap(), peaks[2]);
     }
 }

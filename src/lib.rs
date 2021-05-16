@@ -163,6 +163,21 @@ where
         self.store.hash_at(pos.saturating_sub(1))
     }
 
+    /// Return MMR peaks as a vec
+    fn peaks(&self) -> Vec<Hash> {
+        utils::peaks(self.size)
+            .into_iter()
+            .filter_map(move |p| self.store.peak_hash_at(p.saturating_sub(1)).ok())
+            .collect()
+    }
+
+    /// Return the root hash of the MMR.
+    ///
+    /// Find all the current peaks and bag them together into a single peak hash.
+    pub fn root(&self) -> Result<Hash, Error> {
+        todo!()
+    }
+
     /// Calculate a single MMR root by 'bagging the peaks'.
     ///
     /// Return the number of new nodes added as well as a merkle path to the MMR root.

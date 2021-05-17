@@ -27,4 +27,6 @@ pub enum Error {
     ParseHex(String),
     #[error("merkle proof error: `{0}`")]
     Proof(String),
+    #[error("invalid MMR: `{0}`")]
+    Invalid(String),
 }

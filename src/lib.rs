@@ -17,6 +17,7 @@
 
 use std::marker::PhantomData;
 
+use hash::ZERO_HASH;
 use utils::is_leaf;
 
 pub use {
@@ -175,7 +176,21 @@ where
     ///
     /// Find all the current peaks and bag them together into a single peak hash.
     pub fn root(&self) -> Result<Hash, Error> {
-        todo!()
+        if self.size == 0 {
+            return Ok(ZERO_HASH);
+        }
+
+        let mut hash = None;
+        let preaks = self.peaks();
+
+        for p in preaks.into_iter().rev() {
+            hash = match hash {
+                None => Some(p),
+                Some(h) => Some(hash_with_index(self.size, &(p, h).hash())),
+            }
+        }
+
+        hash.ok_or_else(|| Error::Invalid(format!("root missing")))
     }
 
     /// Calculate a single MMR root by 'bagging the peaks'.

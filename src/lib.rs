@@ -190,7 +190,7 @@ where
             }
         }
 
-        hash.ok_or_else(|| Error::Invalid(format!("root missing")))
+        hash.ok_or_else(|| Error::Invalid("root missing".to_string()))
     }
 
     /// Calculate a single MMR root by 'bagging the peaks'.
@@ -580,5 +580,44 @@ mod tests {
         assert_eq!(mmr.hash(15).unwrap(), peaks[0]);
         assert_eq!(mmr.hash(18).unwrap(), peaks[1]);
         assert_eq!(mmr.hash(19).unwrap(), peaks[2]);
+    }
+
+    #[test]
+    fn root_works() {
+        let mmr = make_mmr(1);
+        let root = mmr.root().unwrap();
+        let hash = mmr.hash(1).unwrap();
+
+        assert_eq!(root, hash);
+
+        let mmr = make_mmr(2);
+        let root = mmr.root().unwrap();
+        let hash = mmr.hash(3).unwrap();
+
+        assert_eq!(root, hash);
+
+        let mmr = make_mmr(4);
+        let root = mmr.root().unwrap();
+        let hash = mmr.hash(7).unwrap();
+
+        assert_eq!(root, hash);
+
+        let mmr = make_mmr(6);
+        let root = mmr.root().unwrap();
+        let h1 = mmr.hash(7).unwrap();
+        let h2 = mmr.hash(10).unwrap();
+        let hash = hash_with_index(mmr.size, &(h1, h2).hash());
+
+        assert_eq!(root, hash);
+
+        let mmr = make_mmr(11);
+        let root = mmr.root().unwrap();
+        let h1 = mmr.hash(18).unwrap();
+        let h2 = mmr.hash(19).unwrap();
+        let h2 = hash_with_index(mmr.size, &(h1, h2).hash());
+        let h1 = mmr.hash(15).unwrap();
+        let hash = hash_with_index(mmr.size, &(h1, h2).hash());
+
+        assert_eq!(root, hash);
     }
 }

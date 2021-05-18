@@ -79,9 +79,7 @@ fn verify_proof_single_peak() {
     assert_eq!(7, proof.mmr_size);
     assert_eq!(2, proof.path.len());
 
-    assert!(proof
-        .verify(mmr.hash(mmr.size).unwrap(), &vec![3u8], 5)
-        .unwrap());
+    assert!(proof.verify(mmr.root().unwrap(), &vec![3u8], 5).unwrap());
 }
 
 #[test]
@@ -91,4 +89,19 @@ fn verify_proof_two_peaks() {
 
     assert_eq!(10, proof.mmr_size);
     assert_eq!(2, proof.path.len());
+    assert!(proof.verify(mmr.root().unwrap(), &vec![4u8], 8).unwrap());
+}
+
+#[test]
+fn verify_proof_three_peaks() {
+    let mmr = make_mmr(11);
+
+    let proof = mmr.proof(5).unwrap();
+    assert!(proof.verify(mmr.root().unwrap(), &vec![3u8], 5).unwrap());
+
+    let proof = mmr.proof(16).unwrap();
+    assert!(proof.verify(mmr.root().unwrap(), &vec![8u8], 16).unwrap());
+
+    let proof = mmr.proof(19).unwrap();
+    assert!(proof.verify(mmr.root().unwrap(), &vec![10u8], 19).unwrap());
 }

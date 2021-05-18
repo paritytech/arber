@@ -164,7 +164,10 @@ where
         self.store.hash_at(pos.saturating_sub(1))
     }
 
-    /// Return MMR peaks as a vec
+    /// Return MMR peak hashes as a vec
+    ///
+    /// Peaks are listed left to right, starting with the leftmost peak. The leftmost
+    /// peak is also always the 'highest' peak.
     pub fn peaks(&self) -> Vec<Hash> {
         utils::peaks(self.size)
             .into_iter()
@@ -181,9 +184,9 @@ where
         }
 
         let mut hash = None;
-        let preaks = self.peaks();
+        let peaks = self.peaks();
 
-        for p in preaks.into_iter().rev() {
+        for p in peaks.into_iter().rev() {
             hash = match hash {
                 None => Some(p),
                 Some(h) => Some(hash_with_index(self.size, &(p, h).hash())),

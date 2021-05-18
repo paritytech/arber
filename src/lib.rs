@@ -281,7 +281,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::Hashable;
+    use crate::{hash::ZERO_HASH, Hashable};
 
     use super::{hash_with_index, Error, Hash, MerkleMountainRange, VecStore};
 
@@ -619,5 +619,14 @@ mod tests {
         let hash = hash_with_index(mmr.size, &(h1, h2).hash());
 
         assert_eq!(root, hash);
+    }
+
+    #[test]
+    fn root_fails() {
+        let s = VecStore::<E>::new();
+        let mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+        let root = mmr.root().unwrap();
+
+        assert_eq!(ZERO_HASH, root);
     }
 }

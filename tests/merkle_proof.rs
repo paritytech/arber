@@ -15,7 +15,10 @@
 
 //! Merkle proof store tests
 
-use merkle_mountain_range::{hash_with_index, Error, Hashable, MerkleMountainRange, VecStore};
+use codec::{DecodeAll, Encode};
+use merkle_mountain_range::{
+    hash_with_index, Error, Hashable, MerkleMountainRange, MerkleProof, VecStore,
+};
 
 type E = Vec<u8>;
 
@@ -104,4 +107,14 @@ fn verify_proof_three_peaks() {
 
     let proof = mmr.proof(19).unwrap();
     assert!(proof.verify(mmr.root().unwrap(), &vec![10u8], 19).unwrap());
+}
+
+#[test]
+fn proof_encode_decode() {
+    let mmr = make_mmr(11);
+    let proof = mmr.proof(5).unwrap();
+    let bytes = proof.encode();
+    let proof = MerkleProof::decode_all(&bytes).unwrap();
+
+    assert!(proof.verify(mmr.root().unwrap(), &vec![3u8], 5).unwrap());
 }

@@ -15,9 +15,12 @@
 
 //! Merkle Proof for a MMR path
 
-use crate::{error::Error, hash_with_index, utils, Hash, Hashable};
+use {
+    crate::{error::Error, hash_with_index, utils, Hash, Hashable},
+    codec::{Decode, Encode},
+};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Encode, Decode)]
 pub struct MerkleProof {
     pub mmr_size: u64,
     pub path: Vec<Hash>,

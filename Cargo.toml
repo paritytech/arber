@@ -1,11 +1,15 @@
 [package]
-name = "merkle-mountain-range"
-version = "0.1.0"
+name = "arber"
 authors = ["Andreas Doerr"]
+version = "0.0.1"
 edition = "2018"
-license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "A generalized merkle mountain range library"
+repository = "http://github.com/adoerr/arber"
+readme = "README.md"
+keywords = ["merkle-mountain-range", "mmr", "merkle-trees"]
+categories = "data-structures"
+license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
 
 [dependencies]
 codec = { version = "2.1.1", package = "parity-scale-codec", default-features = false, features = ["derive"] }

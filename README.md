@@ -1,8 +1,8 @@
-# Merkle-Mountain-Range
+# arber
 
-A merkle mountain range implementation. The following description is taken from 
-[this](https://github.com/mimblewimble/grin/blob/master/doc/mmr.md) excellent
-introduction.
+[arber](https://en.wikipedia.org/wiki/Gro%C3%9Fer_Arber) is a merkle mountain range implementation.
+
+The following description is taken from [this](https://github.com/mimblewimble/grin/blob/master/doc/mmr.md) excellent introduction.
 
 Merkle Mountain Ranges [1] are an alternative to Merkle trees [2]. While the
 Merkle tree relies on perfectly balanced binary trees, Merkle Mountain Ranges
@@ -41,7 +41,7 @@ This structure can be fully described simply from its size (19).
 
 <br>
 
-🚧 **MMR is currently under construction - a hardhat is recommended beyond this point** 🚧
+🚧 **arber is currently under construction - a hardhat is recommended beyond this point** 🚧
 
 <br>
 

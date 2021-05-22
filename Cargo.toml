@@ -7,7 +7,7 @@ edition = "2018"
 description = "A merkle mountain range library"
 repository = "http://github.com/adoerr/arber"
 readme = "README.md"
-keywords = ["merkle", "mountain", "range", "mmr", "merkle-trees", "crypto", "accumulator"]
+keywords = ["mmr", "merkle-trees", "crypto", "accumulator"]
 categories = ["data-structures"]
 license = "Apache-2.0"
 

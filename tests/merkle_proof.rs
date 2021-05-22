@@ -15,10 +15,8 @@
 
 //! Merkle proof store tests
 
+use arber::{hash_with_index, Error, Hashable, MerkleMountainRange, MerkleProof, VecStore};
 use codec::{DecodeAll, Encode};
-use merkle_mountain_range::{
-    hash_with_index, Error, Hashable, MerkleMountainRange, MerkleProof, VecStore,
-};
 
 type E = Vec<u8>;
 

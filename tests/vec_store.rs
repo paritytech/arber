@@ -15,7 +15,7 @@
 
 //! MMR vector store tests
 
-use merkle_mountain_range::{MerkleMountainRange, VecStore};
+use arber::{MerkleMountainRange, VecStore};
 
 type E = Vec<u8>;
 

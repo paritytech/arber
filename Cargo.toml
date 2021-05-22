@@ -8,7 +8,7 @@ description = "A generalized merkle mountain range library"
 repository = "http://github.com/adoerr/arber"
 readme = "README.md"
 keywords = ["merkle-mountain-range", "mmr", "merkle-trees"]
-categories = "data-structures"
+categories = ["data-structures"]
 license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
 
 [dependencies]

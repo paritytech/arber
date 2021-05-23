@@ -1,6 +1,6 @@
 # arber
 
-[arber](https://en.wikipedia.org/wiki/Gro%C3%9Fer_Arber) is a merkle mountain range implementation.
+[arber](https://en.wikipedia.org/wiki/Gro%C3%9Fer_Arber) is a Merkle-Mountain-Range (MMR) implementation.
 
 The following description is taken from [this](https://github.com/mimblewimble/grin/blob/master/doc/mmr.md) excellent introduction.
 

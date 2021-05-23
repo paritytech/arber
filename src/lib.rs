@@ -33,15 +33,15 @@ mod proof;
 mod store;
 mod utils;
 
-/// Merkle Mountain Range (MMR) implementation.
+/// Merkle-Mountain-Range (MMR) implementation.
 ///
-/// All tree positions start at '1'. MMR positions are depth-frist, post-order tree
+/// All tree positions start at `'1'`. MMR positions are depth-frist, post-order tree
 /// traversal node positions and should not be seen as array indices.
 ///
 /// The MMR `Store`, however, is a flat list representation of the MMR, i.e. an array of
-/// nodes. Hence, `Store` elements are accessed using a '0' based index.
+/// nodes. Hence, `Store` elements are accessed using a `'0'` based index.
 ///
-/// Again, positions are '1' based tree node positions, indices are '0' based `Store`
+/// Again, positions are `'1'` based tree node positions, indices are `'0'` based `Store`
 /// locations.
 pub struct MerkleMountainRange<T, S>
 where

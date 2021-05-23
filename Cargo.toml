@@ -4,7 +4,7 @@ authors = ["Andreas Doerr"]
 version = "0.0.1"
 edition = "2018"
 
-description = "A merkle mountain range library"
+description = "A Merkle-Mountain-Range (MMR) library"
 repository = "http://github.com/adoerr/arber"
 readme = "README.md"
 keywords = ["mmr", "merkle-trees", "crypto", "accumulator"]

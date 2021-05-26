@@ -120,6 +120,15 @@ impl Hashable for Vec<u8> {
     }
 }
 
+impl Hashable for u32 {
+    fn hash(&self) -> Hash {
+        let mut h = Blake2b::new();
+        h.update(self.to_le_bytes());
+        let v = h.finalize();
+        Hash::from_vec(&v)
+    }
+}
+
 impl Hashable for u64 {
     fn hash(&self) -> Hash {
         let mut h = Blake2b::new();
@@ -243,6 +252,21 @@ mod tests {
         let h2 = u2.hash();
 
         let u3 = 1u64;
+        let h3 = u3.hash();
+
+        assert_eq!(h1, h2);
+        assert_ne!(h1, h3);
+        assert_ne!(h2, h3);
+    }
+    #[test]
+    fn u32_hash_works() {
+        let u1 = 0u32;
+        let h1 = u1.hash();
+
+        let u2 = 0u32;
+        let h2 = u2.hash();
+
+        let u3 = 1u32;
         let h3 = u3.hash();
 
         assert_eq!(h1, h2);

@@ -15,10 +15,30 @@
 
 //! arber benchmark
 
-use criterion::{criterion_group, criterion_main, Criterion};
+use {
+    arber::{MerkleMountainRange, VecStore},
+    criterion::{criterion_group, criterion_main, Criterion},
+};
 
-fn bench(_c: &mut Criterion) {
-    // empty
+type E = u32;
+
+macro_rules! mmr {
+    () => {{
+        let s = VecStore::<E>::new();
+        MerkleMountainRange::<E, VecStore<E>>::new(s)
+    }};
+}
+
+fn bench(c: &mut Criterion) {
+    c.bench_function("MMR append", |b| {
+        b.iter(|| {
+            let mut mmr = mmr!();
+
+            for n in 1..=100 {
+                mmr.append(&n).unwrap();
+            }
+        });
+    });
 }
 
 criterion_group!(benches, bench);

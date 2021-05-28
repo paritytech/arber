@@ -18,7 +18,7 @@
 use rand::Rng;
 
 use {
-    arber::{MerkleMountainRange, VecStore},
+    arber::{MerkleMountainRange, MerkleProof, VecStore},
     criterion::{criterion_group, criterion_main, Criterion},
     rand::thread_rng,
 };
@@ -49,13 +49,31 @@ fn bench(c: &mut Criterion) {
     });
 
     c.bench_function("MMR proof", |b| {
-        let mmr = make_mmr(19);
+        let mmr = make_mmr(11);
         let leafs = vec![1u64, 2, 4, 5, 8, 9, 11, 12, 16, 17, 19];
         let mut rng = thread_rng();
 
         b.iter(|| {
             let idx = rng.gen_range(0..=(leafs.len() - 1));
             let _ = mmr.proof(leafs[idx]).unwrap();
+        });
+    });
+
+    c.bench_function("MMR verfiy", |b| {
+        let mmr = make_mmr(11);
+        let leafs = vec![1u64, 2, 4, 5, 8, 9, 11, 12, 16, 17, 19];
+        let mut proofs = Vec::<MerkleProof>::new();
+
+        leafs.iter().for_each(|l| {
+            proofs.push(mmr.proof(*l).unwrap());
+        });
+
+        let root = mmr.root().unwrap();
+        let mut rng = thread_rng();
+
+        b.iter(|| {
+            let idx = rng.gen_range(0..=(proofs.len() - 1));
+            let _ = proofs[idx].verify(root, &(idx as u32), leafs[idx]).unwrap();
         });
     });
 }

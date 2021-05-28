@@ -15,28 +15,47 @@
 
 //! arber benchmark
 
+use rand::Rng;
+
 use {
     arber::{MerkleMountainRange, VecStore},
     criterion::{criterion_group, criterion_main, Criterion},
+    rand::thread_rng,
 };
 
 type E = u32;
 
-macro_rules! mmr {
-    () => {{
-        let s = VecStore::<E>::new();
-        MerkleMountainRange::<E, VecStore<E>>::new(s)
-    }};
+fn make_mmr(num_leafs: u8) -> MerkleMountainRange<E, VecStore<E>> {
+    let s = VecStore::<E>::new();
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+
+    (0..=num_leafs.saturating_sub(1)).for_each(|i| {
+        let _ = mmr.append(&(i as u32)).unwrap();
+    });
+
+    mmr
 }
 
 fn bench(c: &mut Criterion) {
     c.bench_function("MMR append", |b| {
         b.iter(|| {
-            let mut mmr = mmr!();
+            let s = VecStore::<E>::new();
+            let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
             for n in 1..=100 {
                 mmr.append(&n).unwrap();
             }
+        });
+    });
+
+    c.bench_function("MMR proof", |b| {
+        let mmr = make_mmr(19);
+        let leafs = vec![1u64, 2, 4, 5, 8, 9, 11, 12, 16, 17, 19];
+        let mut rng = thread_rng();
+
+        b.iter(|| {
+            let idx = rng.gen_range(0..=(leafs.len() - 1));
+            let _ = mmr.proof(leafs[idx]).unwrap();
         });
     });
 }

@@ -15,7 +15,8 @@
 
 //! Merkle-Mountain-Range implementation.
 
-use std::marker::PhantomData;
+#[cfg(feature = "std")]
+include!("std.rs");
 
 use hash::ZERO_HASH;
 use utils::is_leaf;

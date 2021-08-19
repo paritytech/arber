@@ -15,7 +15,7 @@
 
 //! Merkle-Mountain-Range storage
 
-use crate::{Error, Hash};
+use crate::{format, vec, Error, Hash, Vec};
 
 pub trait Store<T>
 where

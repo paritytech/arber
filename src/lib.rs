@@ -15,8 +15,15 @@
 
 //! Merkle-Mountain-Range implementation.
 
+#![cfg_attr(not(feature = "std"), no_std)]
+
 #[cfg(feature = "std")]
 include!("std.rs");
+
+#[cfg(not(feature = "std"))]
+include!("no_std.rs");
+
+use core::marker::PhantomData;
 
 use hash::ZERO_HASH;
 use utils::is_leaf;

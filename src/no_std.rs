@@ -13,7 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::format;
-use std::string::String;
-use std::vec;
-use std::vec::Vec;
+pub extern crate alloc;
+
+use alloc::format;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;

@@ -17,6 +17,8 @@
 
 use thiserror::Error;
 
+use crate::String;
+
 #[derive(Error, Debug, PartialEq)]
 pub enum Error {
     #[error("store error: `{0}`")]

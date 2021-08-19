@@ -15,20 +15,23 @@
 
 //! Hash type
 
-use {
-    crate::Error,
-    blake2::{Blake2b, Digest},
-    codec::{Decode, Encode},
+use core::{
+    cmp::min,
+    convert::AsRef,
+    fmt::{self, Write},
 };
+
+use blake2::{Blake2b, Digest};
+use codec::{Decode, Encode};
+
+use crate::{Error, String, Vec};
 
 macro_rules! to_hex {
     ($bytes:expr) => {{
-        use $crate::fmt::Write;
-
         let mut s = String::with_capacity(64);
 
         for b in $bytes {
-            core::write!(&mut s, "{:02x}", b)?
+            write!(&mut s, "{:02x}", b)?
         }
 
         Ok(s)
@@ -43,8 +46,8 @@ pub struct Hash([u8; 32]);
 /// A hash consisting of all zeros.
 pub const ZERO_HASH: Hash = Hash([0; 32]);
 
-impl crate::fmt::Debug for Hash {
-    fn fmt(&self, f: &mut crate::fmt::Formatter<'_>) -> crate::fmt::Result {
+impl fmt::Debug for Hash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         const DISP_SIZE: usize = 12;
 
         let hex = to_hex!(&self.0)?;
@@ -52,9 +55,9 @@ impl crate::fmt::Debug for Hash {
     }
 }
 
-impl crate::fmt::Display for Hash {
-    fn fmt(&self, f: &mut crate::fmt::Formatter<'_>) -> crate::fmt::Result {
-        crate::fmt::Debug::fmt(self, f)
+impl fmt::Display for Hash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(self, f)
     }
 }
 
@@ -74,7 +77,7 @@ impl Hash {
     /// than [`Hash::LEN`] bytes, the hash will be padded with 0's from left to right.
     pub fn from_vec(v: &[u8]) -> Hash {
         let mut h = [0; Hash::LEN];
-        let sz = crate::min(v.len(), Hash::LEN);
+        let sz = min(v.len(), Hash::LEN);
         h[..sz].copy_from_slice(&v[..sz]);
         Hash(h)
     }

@@ -15,6 +15,8 @@
 
 //! Utiility functions mainly for MMR navigation
 
+use crate::{vec, Vec};
+
 /// 64-bit all being binary ones: 0b1111111...1
 const ALL_ONES: u64 = u64::MAX;
 

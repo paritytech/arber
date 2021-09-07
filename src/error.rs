@@ -15,20 +15,29 @@
 
 //! Merkle-Mountain-Range errors
 
-use thiserror::Error;
+use core::write;
 
 use crate::String;
 
-#[derive(Error, Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Error {
-    #[error("store error: `{0}`")]
     Store(String),
-    #[error("validation error: `{0}`")]
     Validate(String),
-    #[error("failed to parse string as hex: `{0}`")]
     ParseHex(String),
-    #[error("merkle proof error: `{0}`")]
     Proof(String),
-    #[error("invalid MMR: `{0}`")]
     Invalid(String),
+}
+
+impl core::fmt::Display for Error {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Error::Store(msg) => write!(f, "store error: `{}`", msg)?,
+            Error::Validate(msg) => write!(f, "validation error: `{}`", msg)?,
+            Error::ParseHex(msg) => write!(f, "failed to parse string as hex: `{}`", msg)?,
+            Error::Proof(msg) => write!(f, "merkle proof error: `{}`", msg)?,
+            Error::Invalid(msg) => write!(f, "invald MMR: `{}`", msg)?,
+        }
+
+        Ok(())
+    }
 }

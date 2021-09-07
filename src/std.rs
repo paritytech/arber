@@ -17,3 +17,5 @@ use std::format;
 use std::string::String;
 use std::vec;
 use std::vec::Vec;
+
+impl std::error::Error for crate::Error {}

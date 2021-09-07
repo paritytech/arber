@@ -82,10 +82,8 @@ impl<T> Default for VecStore<T> {
 #[cfg(test)]
 mod tests {
 
-    use {
-        super::{Error, Store, VecStore},
-        crate::Hashable,
-    };
+    use super::{Error, Store, VecStore};
+    use crate::Hashable;
 
     #[test]
     fn append_works() {

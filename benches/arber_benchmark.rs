@@ -15,13 +15,10 @@
 
 //! arber benchmark
 
-use rand::Rng;
+use criterion::{criterion_group, criterion_main, Criterion};
+use rand::{thread_rng, Rng};
 
-use {
-    arber::{MerkleMountainRange, MerkleProof, VecStore},
-    criterion::{criterion_group, criterion_main, Criterion},
-    rand::thread_rng,
-};
+use arber::{MerkleMountainRange, MerkleProof, VecStore};
 
 type E = u32;
 

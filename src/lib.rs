@@ -28,12 +28,10 @@ use core::marker::PhantomData;
 use hash::ZERO_HASH;
 use utils::is_leaf;
 
-pub use {
-    error::Error,
-    hash::{hash_with_index, Hash, Hashable},
-    proof::MerkleProof,
-    store::{Store, VecStore},
-};
+pub use error::Error;
+pub use hash::{hash_with_index, Hash, Hashable};
+pub use proof::MerkleProof;
+pub use store::{Store, VecStore};
 
 mod error;
 mod hash;

@@ -21,6 +21,9 @@ use core::{
     fmt::{self, Write},
 };
 
+#[cfg(not(feature = "std"))]
+use alloc::string::ToString;
+
 use blake2::{Blake2b, Digest};
 use codec::{Decode, Encode};
 

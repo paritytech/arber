@@ -15,7 +15,10 @@
 
 //! Merkle-Mountain-Range errors
 
-use core::write;
+use core::{
+    marker::{Send, Sync},
+    write,
+};
 
 use crate::String;
 
@@ -27,6 +30,10 @@ pub enum Error {
     Proof(String),
     Invalid(String),
 }
+
+unsafe impl Send for Error {}
+
+unsafe impl Sync for Error {}
 
 impl core::fmt::Display for Error {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {

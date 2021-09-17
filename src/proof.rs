@@ -90,26 +90,3 @@ impl MerkleProof {
         }
     }
 }
-
-#[cfg(test)]
-mod test {
-    use crate::{MerkleMountainRange, VecStore};
-
-    type E = Vec<u8>;
-
-    #[test]
-    fn minimal_proof_works() {
-        let s = VecStore::<E>::new();
-        let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
-
-        let node = vec![42u8];
-        let size = mmr.append(&node).unwrap();
-        let proof = mmr.proof(size).unwrap();
-
-        assert_eq!(proof.mmr_size, 1);
-        assert_eq!(proof.path.len(), 0);
-
-        let root = mmr.hash(size).unwrap();
-        assert!(proof.verify(root, &node, size).unwrap());
-    }
-}

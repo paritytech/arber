@@ -234,12 +234,12 @@ fn hash_error_works() {
     let s = VecStore::<E>::new();
     let mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
 
-    let want = Error::Store("missing hash at: 0".to_string());
+    let want = Error::MissingHashAtIndex(0);
     let got = mmr.hash(0).err().unwrap();
 
     assert_eq!(want, got);
 
-    let want = Error::Store("missing hash at: 2".to_string());
+    let want = Error::MissingHashAtIndex(2);
     let got = mmr.hash(3).err().unwrap();
 
     assert_eq!(want, got);

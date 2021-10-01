@@ -26,6 +26,10 @@ use crate::String;
 
 #[derive(Display, Debug, PartialEq, Eq, Clone)]
 pub enum Error {
+    #[displaydoc("invalid node height: {0}")]
+    InvalidNodeHeight(u64),
+    #[displaydoc("missing hash at index: {0}")]
+    MissingHashAtIndex(u64),
     #[displaydoc("store error: {0}")]
     Store(String),
     #[displaydoc("validation error: {0}")]

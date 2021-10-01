@@ -15,7 +15,7 @@
 
 //! Merkle-Mountain-Range storage
 
-use crate::{format, vec, Error, Hash, Vec};
+use crate::{vec, Error, Hash, Vec};
 
 #[cfg(test)]
 #[path = "store_tests.rs"]
@@ -57,14 +57,14 @@ where
         self.hashes
             .get(idx as usize)
             .cloned()
-            .ok_or_else(|| Error::Store(format!("missing hash at: {}", idx)))
+            .ok_or_else(|| Error::MissingHashAtIndex(idx))
     }
 
     fn peak_hash_at(&self, idx: u64) -> Result<Hash, Error> {
         self.hashes
             .get(idx as usize)
             .cloned()
-            .ok_or_else(|| Error::Store(format!("missing peak hash at: {}", idx)))
+            .ok_or_else(|| Error::MissingHashAtIndex(idx))
     }
 }
 

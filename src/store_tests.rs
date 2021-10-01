@@ -61,12 +61,12 @@ fn peak_hash_at_works() {
 
 #[test]
 fn peak_hash_at_fails() {
-    let want = Error::Store("missing peak hash at: 3".to_string());
+    let want = Err(Error::MissingHashAtIndex(3));
 
     let store = VecStore::<Vec<u8>>::new();
     let got = store.peak_hash_at(3);
 
-    assert_eq!(Err(want), got);
+    assert_eq!(want, got);
 }
 
 #[test]
@@ -88,10 +88,10 @@ fn hash_at_works() {
 
 #[test]
 fn hash_at_fails() {
-    let want = Error::Store("missing hash at: 3".to_string());
+    let want = Err(Error::MissingHashAtIndex(3));
 
     let store = VecStore::<Vec<u8>>::new();
     let got = store.hash_at(3);
 
-    assert_eq!(Err(want), got);
+    assert_eq!(want, got);
 }

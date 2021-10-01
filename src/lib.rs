@@ -87,10 +87,7 @@ where
 
         // a new node always has to be a leave node (height = 0)
         if node_height != 0 {
-            return Err(Error::Store(format!(
-                "invalid leave height: {}",
-                node_height
-            )));
+            return Err(Error::InvalidNodeHeight(node_height));
         }
 
         let (new, peak_hashes) = self.bag_the_peaks(node_hash, peak_map)?;

@@ -20,31 +20,24 @@ use core::{
     write,
 };
 
+use displaydoc::Display;
+
 use crate::String;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Display, Debug, PartialEq, Eq, Clone)]
 pub enum Error {
+    #[displaydoc("store error: {0}")]
     Store(String),
+    #[displaydoc("validation error: {0}")]
     Validate(String),
+    #[displaydoc("hex parse error: {0}")]
     ParseHex(String),
+    #[displaydoc("merkle proof error: {0}")]
     Proof(String),
+    #[displaydoc("invalid MMR error: {0}")]
     Invalid(String),
 }
 
 unsafe impl Send for Error {}
 
 unsafe impl Sync for Error {}
-
-impl core::fmt::Display for Error {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-        match self {
-            Error::Store(msg) => write!(f, "store error: `{}`", msg)?,
-            Error::Validate(msg) => write!(f, "validation error: `{}`", msg)?,
-            Error::ParseHex(msg) => write!(f, "failed to parse string as hex: `{}`", msg)?,
-            Error::Proof(msg) => write!(f, "merkle proof error: `{}`", msg)?,
-            Error::Invalid(msg) => write!(f, "invald MMR: `{}`", msg)?,
-        }
-
-        Ok(())
-    }
-}

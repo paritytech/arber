@@ -32,6 +32,8 @@ pub enum Error {
     MissingHashAtIndex(u64),
     #[displaydoc("invalid node hash at idx {0}: {1} != {2}")]
     InvalidNodeHash(u64, Hash, Hash),
+    #[displaydoc("invalid root hash: {0} != {1}")]
+    InvalidRootHash(Hash, Hash),
     #[displaydoc("invalid hex string: {0}")]
     InvalidHexString(String),
     #[displaydoc("merkle proof error: {0}")]

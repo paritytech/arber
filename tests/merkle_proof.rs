@@ -54,9 +54,10 @@ fn single_node() {
     // this root hash is wrong because is has not been hashed with the node index
     let root = node.hash();
 
-    let want = Error::Proof("root mismatch 8c058212512f != e00265169656".to_string());
-    let got = proof.verify(root, &node, size);
-    assert_eq!(Err(want), got);
+    assert_eq!(
+        "invalid root hash: 8c058212512f != e00265169656".to_string(),
+        format!("{}", proof.verify(root, &node, size).err().unwrap())
+    );
 
     let root = hash_with_index(0, &root);
     assert!(proof.verify(root, &node, size).unwrap());

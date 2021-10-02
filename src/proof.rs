@@ -17,7 +17,7 @@
 
 use codec::{Decode, Encode};
 
-use crate::{error::Error, format, hash_with_index, utils, Hash, Hashable, Vec};
+use crate::{error::Error, hash_with_index, utils, Hash, Hashable, Vec};
 
 #[derive(Clone, Debug, PartialEq, Encode, Decode)]
 pub struct MerkleProof {
@@ -63,7 +63,7 @@ impl MerkleProof {
             if root == hash {
                 return Ok(true);
             } else {
-                return Err(Error::Proof(format!("root mismatch {} != {}", hash, root)));
+                return Err(Error::InvalidRootHash(hash, root));
             }
         }
 

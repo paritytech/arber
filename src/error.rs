@@ -30,12 +30,10 @@ pub enum Error {
     InvalidNodeHeight(u64),
     #[displaydoc("missing hash at index: {0}")]
     MissingHashAtIndex(u64),
-    #[displaydoc("store error: {0}")]
-    Store(String),
     #[displaydoc("validation error: {0}")]
     Validate(String),
-    #[displaydoc("hex parse error: {0}")]
-    ParseHex(String),
+    #[displaydoc("invalid hex string: {0}")]
+    InvalidHexString(String),
     #[displaydoc("merkle proof error: {0}")]
     Proof(String),
     #[displaydoc("invalid MMR error: {0}")]

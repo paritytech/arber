@@ -61,11 +61,11 @@ fn from_hex_works() {
 
 #[test]
 fn from_hex_error() {
-    let want = Error::ParseHex("000".to_string());
+    let want = Error::InvalidHexString("000".to_string());
     let got = Hash::from_hex("0x000").err().unwrap();
     assert_eq!(want, got);
 
-    let want = Error::ParseHex("thisisbad".to_string());
+    let want = Error::InvalidHexString("thisisbad".to_string());
     let got = Hash::from_hex("0xthisisbad").err().unwrap();
     assert_eq!(want, got);
 }

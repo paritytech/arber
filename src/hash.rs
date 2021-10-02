@@ -95,7 +95,7 @@ impl Hash {
     pub fn from_hex(hex: &str) -> Result<Hash, Error> {
         match parse_hex(hex) {
             Ok(v) => Ok(Hash::from_vec(&v)),
-            Err(s) => Err(Error::ParseHex(s)),
+            Err(s) => Err(Error::InvalidHexString(s)),
         }
     }
 }

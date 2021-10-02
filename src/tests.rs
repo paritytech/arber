@@ -101,19 +101,35 @@ fn validate_works() {
 fn validate_fails() {
     let mut mmr = make_mmr(3);
 
-    let want = Error::Validate("idx 2: 000000000000 != 9f7d5dc4ed82".to_string());
+    let want = Error::InvalidNodeHash(
+        2,
+        Hash::from_hex("0x00000000000000000000000000000000").unwrap(),
+        Hash::from_hex("0x9f7d5dc4ed828ec11a1101e7a047dd7d").unwrap(),
+    );
 
     mmr.store.hashes[2] = Hash::from_hex("0x00").unwrap();
     let got = mmr.validate().err().unwrap();
+
+    // compare the actual error messages
+    let want = format!("{}", want);
+    let got = format!("{}", got);
 
     assert_eq!(want, got);
 
     let mut mmr = make_mmr(7);
 
-    let want = Error::Validate("idx 6: 000000000000 != 2cabe06f9728".to_string());
+    let want = Error::InvalidNodeHash(
+        6,
+        Hash::from_hex("0x00000000000000000000000000000000").unwrap(),
+        Hash::from_hex("0x2cabe06f9728067daa538c96edbd6ef7").unwrap(),
+    );
 
     mmr.store.hashes[6] = Hash::from_hex("0x00").unwrap();
     let got = mmr.validate().err().unwrap();
+
+    // compare the actual error messages
+    let want = format!("{}", want);
+    let got = format!("{}", got);
 
     assert_eq!(want, got);
 }

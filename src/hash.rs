@@ -47,7 +47,7 @@ macro_rules! to_hex {
 
 /// Generic hash type which should be compatible with most hashes used
 /// within the blockchain domain.
-#[derive(Copy, Clone, PartialEq, Encode, Decode)]
+#[derive(Copy, Clone, PartialEq, Eq, Encode, Decode)]
 pub struct Hash([u8; 32]);
 
 /// A hash consisting of all zeros.

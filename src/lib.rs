@@ -122,10 +122,7 @@ where
                 let parent_hash = self.store.hash_at(idx)?;
 
                 if tmp != parent_hash {
-                    return Err(Error::Validate(format!(
-                        "idx {}: {} != {}",
-                        idx, parent_hash, tmp
-                    )));
+                    return Err(Error::InvalidNodeHash(idx, parent_hash, tmp));
                 }
             }
         }

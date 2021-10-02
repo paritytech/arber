@@ -22,7 +22,7 @@ use core::{
 
 use displaydoc::Display;
 
-use crate::String;
+use crate::{Hash, String};
 
 #[derive(Display, Debug, PartialEq, Eq, Clone)]
 pub enum Error {
@@ -30,8 +30,8 @@ pub enum Error {
     InvalidNodeHeight(u64),
     #[displaydoc("missing hash at index: {0}")]
     MissingHashAtIndex(u64),
-    #[displaydoc("validation error: {0}")]
-    Validate(String),
+    #[displaydoc("invalid node hash at idx {0}: {1} != {2}")]
+    InvalidNodeHash(u64, Hash, Hash),
     #[displaydoc("invalid hex string: {0}")]
     InvalidHexString(String),
     #[displaydoc("merkle proof error: {0}")]

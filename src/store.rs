@@ -57,14 +57,14 @@ where
         self.hashes
             .get(idx as usize)
             .cloned()
-            .ok_or_else(|| Error::MissingHashAtIndex(idx))
+            .ok_or(Error::MissingHashAtIndex(idx))
     }
 
     fn peak_hash_at(&self, idx: u64) -> Result<Hash, Error> {
         self.hashes
             .get(idx as usize)
             .cloned()
-            .ok_or_else(|| Error::MissingHashAtIndex(idx))
+            .ok_or(Error::MissingHashAtIndex(idx))
     }
 }
 

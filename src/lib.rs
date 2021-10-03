@@ -133,7 +133,7 @@ where
     /// Return a MMR membership proof for a leaf node at position `pos`.
     pub fn proof(&self, pos: u64) -> Result<MerkleProof, Error> {
         if !is_leaf(pos) {
-            return Err(Error::Proof(format!("not a leaf node at pos {}", pos)));
+            return Err(Error::ExpectingLeafNode(pos));
         }
 
         self.hash(pos)?;

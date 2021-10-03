@@ -15,7 +15,7 @@
 
 //! Merkle proof store tests
 
-use arber::{hash_with_index, Error, Hashable, MerkleMountainRange, MerkleProof, VecStore};
+use arber::{hash_with_index, Hashable, MerkleMountainRange, MerkleProof, VecStore};
 use codec::{DecodeAll, Encode};
 
 type E = Vec<u8>;
@@ -36,10 +36,10 @@ fn make_mmr(num_leafs: u8) -> MerkleMountainRange<E, VecStore<E>> {
 fn non_existing_node() {
     let mmr = make_mmr(7);
 
-    let want = Error::Proof("not a leaf node at pos 7".to_string());
-    let res = mmr.proof(7);
-
-    assert_eq!(Err(want), res);
+    assert_eq!(
+        "expecting leaf node at pos: 7".to_string(),
+        format!("{}", mmr.proof(7).err().unwrap()),
+    );
 }
 
 #[test]

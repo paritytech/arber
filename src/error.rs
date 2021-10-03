@@ -26,18 +26,18 @@ use crate::{Hash, String};
 
 #[derive(Display, Debug, PartialEq, Eq, Clone)]
 pub enum Error {
-    #[displaydoc("invalid node height: {0}")]
-    InvalidNodeHeight(u64),
-    #[displaydoc("missing hash at index: {0}")]
-    MissingHashAtIndex(u64),
-    #[displaydoc("invalid node hash at idx {0}: {1} != {2}")]
-    InvalidNodeHash(u64, Hash, Hash),
-    #[displaydoc("invalid root hash: {0} != {1}")]
-    InvalidRootHash(Hash, Hash),
+    #[displaydoc("expecting leaf node at pos: {0}")]
+    ExpectingLeafNode(u64),
     #[displaydoc("invalid hex string: {0}")]
     InvalidHexString(String),
-    #[displaydoc("merkle proof error: {0}")]
-    Proof(String),
+    #[displaydoc("invalid node hash at idx {0}: {1} != {2}")]
+    InvalidNodeHash(u64, Hash, Hash),
+    #[displaydoc("invalid node height: {0}")]
+    InvalidNodeHeight(u64),
+    #[displaydoc("invalid root hash: {0} != {1}")]
+    InvalidRootHash(Hash, Hash),
+    #[displaydoc("missing hash at index: {0}")]
+    MissingHashAtIndex(u64),
     #[displaydoc("invalid MMR error: {0}")]
     Invalid(String),
 }

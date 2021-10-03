@@ -138,10 +138,10 @@ fn validate_fails() {
 fn proof_fails() {
     let mmr = make_mmr(2);
 
-    let want = Error::Proof("not a leaf node at pos 3".to_string());
-    let got = mmr.proof(3).err().unwrap();
-
-    assert_eq!(want, got);
+    assert_eq!(
+        "expecting leaf node at pos: 3".to_string(),
+        format!("{}", mmr.proof(3).err().unwrap()),
+    );
 }
 
 #[test]

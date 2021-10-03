@@ -196,7 +196,7 @@ where
             }
         }
 
-        hash.ok_or_else(|| Error::Invalid("root missing".to_string()))
+        hash.ok_or(Error::MissingRootNode)
     }
 
     /// Calculate a single MMR root by 'bagging the peaks'.

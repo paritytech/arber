@@ -38,8 +38,8 @@ pub enum Error {
     InvalidRootHash(Hash, Hash),
     #[displaydoc("missing hash at index: {0}")]
     MissingHashAtIndex(u64),
-    #[displaydoc("invalid MMR error: {0}")]
-    Invalid(String),
+    #[displaydoc("missing root node")]
+    MissingRootNode,
 }
 
 unsafe impl Send for Error {}

@@ -178,6 +178,32 @@ fn proof_works() {
 }
 
 #[test]
+fn partial_prove_works() -> Result<(), Error> {
+    let mut mmr = make_mmr(4);
+    let proof_1 = mmr.proof(4)?;
+
+    mmr.append(&vec![4; 10])?;
+    mmr.append(&vec![5; 10])?;
+
+    let proof_2 = mmr.partial_proof(4, 7)?;
+
+    assert_eq!(proof_1, proof_2);
+
+    let mut mmr = make_mmr(8);
+    let proof_1 = mmr.proof(11)?;
+
+    mmr.append(&vec![8; 10])?;
+    mmr.append(&vec![9; 10])?;
+    mmr.append(&vec![10; 10])?;
+
+    let proof_2 = mmr.partial_proof(11, 15)?;
+
+    assert_eq!(proof_1, proof_2);
+
+    Ok(())
+}
+
+#[test]
 fn bag_lower_peaks_works() {
     let mmr = make_mmr(2);
     let got = mmr.bag_lower_peaks(3);

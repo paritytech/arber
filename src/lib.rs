@@ -131,6 +131,12 @@ where
     }
 
     /// Return a MMR membership proof for a leaf node at position `pos`.
+    ///
+    /// Note that this proof is `complete` in the sense that it does include all
+    /// nodes up to the MMR root.
+    ///
+    /// See [`partial_proof()`] for a proof containing only a subset of the nodes.
+    ///
     pub fn proof(&self, pos: u64) -> Result<MerkleProof, Error> {
         if !is_leaf(pos) {
             return Err(Error::ExpectingLeafNode(pos));
@@ -155,6 +161,37 @@ where
 
         Ok(MerkleProof {
             mmr_size: self.size,
+            path,
+        })
+    }
+
+    /// Return a MMR membership proof for a leaf at position `pos` including `size` nodes.
+    ///
+    /// Note that this is a `partial` proof in the sense that it does **not** include all
+    /// nodes. Only a subset of nodes for a MMR with the given size is included.
+    ///
+    /// See [`proof()`] for a complete proof.
+    ///
+    pub fn partial_proof(&self, pos: u64, size: u64) -> Result<MerkleProof, Error> {
+        let family_path = utils::family_path(pos, size);
+
+        let mut path = family_path
+            .iter()
+            .filter_map(|x| self.hash(x.1).ok())
+            .collect::<Vec<_>>();
+
+        let peak = if let Some(n) = family_path.last() {
+            n.0
+        } else {
+            pos
+        };
+
+        if peak < size {
+            path.append(&mut self.peak_path(peak));
+        }
+
+        Ok(MerkleProof {
+            mmr_size: size,
             path,
         })
     }

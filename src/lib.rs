@@ -173,6 +173,12 @@ where
     /// See [`proof()`] for a complete proof.
     ///
     pub fn partial_proof(&self, pos: u64, size: u64) -> Result<MerkleProof, Error> {
+        if !is_leaf(pos) {
+            return Err(Error::ExpectingLeafNode(pos));
+        }
+
+        self.hash(pos)?;
+
         let family_path = utils::family_path(pos, size);
 
         let mut path = family_path

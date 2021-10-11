@@ -28,7 +28,7 @@ use core::marker::PhantomData;
 use hash::ZERO_HASH;
 use utils::is_leaf;
 
-pub use error::Error;
+pub use error::{Error, Result};
 pub use hash::{hash_with_index, Hash, Hashable};
 pub use proof::MerkleProof;
 pub use store::{Store, VecStore};
@@ -79,7 +79,7 @@ where
     }
 
     /// Append `elem` to the MMR. Return new MMR size.
-    pub fn append(&mut self, elem: &T) -> Result<u64, Error> {
+    pub fn append(&mut self, elem: &T) -> Result<u64> {
         let idx = self.size;
         let node_hash = hash_with_index(idx, &elem.clone().hash());
 
@@ -100,7 +100,7 @@ where
 
     /// Validate the MMR by re-calculating the hash of all inner, i.e. parent nodes.
     /// Retrun `true`, if the MMR is valid or an error.
-    pub fn validate(&self) -> Result<bool, Error> {
+    pub fn validate(&self) -> Result<bool> {
         for pos in 1..=self.size {
             let height = utils::node_height(pos);
 
@@ -137,7 +137,7 @@ where
     ///
     /// See [`partial_proof()`] for a proof containing only a subset of the nodes.
     ///
-    pub fn proof(&self, pos: u64) -> Result<MerkleProof, Error> {
+    pub fn proof(&self, pos: u64) -> Result<MerkleProof> {
         if !is_leaf(pos) {
             return Err(Error::ExpectingLeafNode(pos));
         }
@@ -172,7 +172,7 @@ where
     ///
     /// See [`proof()`] for a complete proof.
     ///
-    pub fn partial_proof(&self, pos: u64, size: u64) -> Result<MerkleProof, Error> {
+    pub fn partial_proof(&self, pos: u64, size: u64) -> Result<MerkleProof> {
         if !is_leaf(pos) {
             return Err(Error::ExpectingLeafNode(pos));
         }
@@ -206,7 +206,7 @@ where
     ///
     /// Note that in case of an error, [`Error::Store`] is returned and the error
     /// message is referring to `pss - 1`, i.e. an index.
-    pub fn hash(&self, pos: u64) -> Result<Hash, Error> {
+    pub fn hash(&self, pos: u64) -> Result<Hash> {
         self.store.hash_at(pos.saturating_sub(1))
     }
 
@@ -224,7 +224,7 @@ where
     /// Return the root hash of the MMR.
     ///
     /// Find all the current peaks and bag them together into a single peak hash.
-    pub fn root(&self) -> Result<Hash, Error> {
+    pub fn root(&self) -> Result<Hash> {
         if self.size == 0 {
             return Ok(ZERO_HASH);
         }
@@ -248,7 +248,7 @@ where
     ///
     /// `peak_map` is obtained from  [`utils::peak_height_map`] and contains an encoded
     /// list of the height for already exisiting MMR peaks.
-    fn bag_the_peaks(&self, node_hash: Hash, peak_map: u64) -> Result<(u64, Vec<Hash>), Error> {
+    fn bag_the_peaks(&self, node_hash: Hash, peak_map: u64) -> Result<(u64, Vec<Hash>)> {
         // start with the node added before `node_hash`
         let mut idx = self.size;
         // number of new nodes added while bagging

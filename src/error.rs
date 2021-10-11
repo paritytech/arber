@@ -17,7 +17,7 @@
 
 use core::{
     marker::{Send, Sync},
-    write,
+    result, write,
 };
 
 use displaydoc::Display;
@@ -45,3 +45,12 @@ pub enum Error {
 unsafe impl Send for Error {}
 
 unsafe impl Sync for Error {}
+
+/// A specialized [`core::result::Result`] type for MMR operations.
+///
+/// This type is used for any MMR operation which may produce an error.
+///
+/// While usual Rust style is to import types directly, aliases of [`core::result::Result`] often
+/// are not, to make it easier to distinguish between them.
+///
+pub type Result<T> = result::Result<T, Error>;

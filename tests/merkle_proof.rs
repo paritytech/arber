@@ -69,7 +69,7 @@ fn minimal_mmr() {
     let proof = mmr.proof(2).unwrap();
 
     assert!(proof
-        .verify(mmr.hash(mmr.size).unwrap(), &vec![1u8], 2)
+        .verify(mmr.hash(mmr.size()).unwrap(), &vec![1u8], 2)
         .unwrap());
 }
 

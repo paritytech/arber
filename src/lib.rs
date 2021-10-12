@@ -57,8 +57,8 @@ where
     T: Hashable + Clone,
     S: Store<T>,
 {
-    /// Total number of MMR nodes, i.e. MMR size
-    pub size: u64,
+    // total number of MMR nodes, i.e. MMR size
+    size: u64,
     // backing store for the MMR
     store: S,
     // make rustc happy
@@ -240,6 +240,11 @@ where
         }
 
         hash.ok_or(Error::MissingRootNode)
+    }
+
+    /// Return MMR size, i.e. total number of nodes.
+    pub fn size(&self) -> u64 {
+        self.size
     }
 
     /// Calculate a single MMR root by 'bagging the peaks'.

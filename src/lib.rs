@@ -70,9 +70,9 @@ where
     T: Hashable + Clone,
     S: Store<T>,
 {
-    pub fn new(store: S) -> Self {
+    pub fn new(size: u64, store: S) -> Self {
         MerkleMountainRange {
-            size: 0,
+            size,
             store,
             _marker: PhantomData,
         }

@@ -22,7 +22,7 @@ type E = Vec<u8>;
 #[test]
 fn append_two_nodes() {
     let s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     let n1 = vec![0u8, 10];
     let pos = mmr.append(&n1).unwrap();
@@ -38,7 +38,7 @@ fn append_two_nodes() {
 #[test]
 fn append_multiple_nodes() {
     let s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
     let mut size = 0;
 
     (0..=10u8).for_each(|i| {
@@ -52,7 +52,7 @@ fn append_multiple_nodes() {
 #[test]
 fn validate_works() {
     let mut s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
     let mut size = 0;
 
     (0..=2u8).for_each(|i| {
@@ -64,7 +64,7 @@ fn validate_works() {
     assert!(mmr.validate().unwrap());
 
     s = VecStore::<E>::new();
-    mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+    mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
     size = 0;
 
     (0..=6u8).for_each(|i| {
@@ -76,7 +76,7 @@ fn validate_works() {
     assert!(mmr.validate().unwrap());
 
     s = VecStore::<E>::new();
-    mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+    mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
     size = 0;
 
     (0..=10u8).for_each(|i| {

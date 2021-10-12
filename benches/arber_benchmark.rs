@@ -24,7 +24,7 @@ type E = u32;
 
 fn make_mmr(num_leafs: u8) -> MerkleMountainRange<E, VecStore<E>> {
     let s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     (0..=num_leafs.saturating_sub(1)).for_each(|i| {
         let _ = mmr.append(&(i as u32)).unwrap();
@@ -37,7 +37,7 @@ fn bench(c: &mut Criterion) {
     c.bench_function("MMR append", |b| {
         b.iter(|| {
             let s = VecStore::<E>::new();
-            let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(s);
+            let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
             for n in 1..=100 {
                 mmr.append(&n).unwrap();

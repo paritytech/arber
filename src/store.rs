@@ -15,7 +15,7 @@
 
 //! Merkle-Mountain-Range storage
 
-use crate::{vec, Error, Hash, Vec};
+use crate::{vec, Error, Hash, Result, Vec};
 
 #[cfg(test)]
 #[path = "store_tests.rs"]
@@ -25,11 +25,9 @@ pub trait Store<T>
 where
     T: Clone,
 {
-    fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<(), Error>;
+    fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<()>;
 
-    fn hash_at(&self, idx: u64) -> Result<Hash, Error>;
-
-    fn peak_hash_at(&self, idx: u64) -> Result<Hash, Error>;
+    fn hash_at(&self, idx: u64) -> Result<Hash>;
 }
 
 pub struct VecStore<T> {
@@ -43,7 +41,7 @@ impl<T> Store<T> for VecStore<T>
 where
     T: Clone,
 {
-    fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<(), Error> {
+    fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<()> {
         if let Some(data) = &mut self.data {
             data.push(elem.clone());
         }
@@ -53,14 +51,7 @@ where
         Ok(())
     }
 
-    fn hash_at(&self, idx: u64) -> Result<Hash, Error> {
-        self.hashes
-            .get(idx as usize)
-            .cloned()
-            .ok_or(Error::MissingHashAtIndex(idx))
-    }
-
-    fn peak_hash_at(&self, idx: u64) -> Result<Hash, Error> {
+    fn hash_at(&self, idx: u64) -> Result<Hash> {
         self.hashes
             .get(idx as usize)
             .cloned()

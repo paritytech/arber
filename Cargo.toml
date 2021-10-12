@@ -3,13 +3,15 @@ name = "arber"
 authors = ["Andreas Doerr"]
 version = "0.1.0-dev"
 edition = "2018"
-
 description = "A Merkle-Mountain-Range (MMR) library"
 repository = "http://github.com/adoerr/arber"
 readme = "README.md"
 keywords = ["mmr", "merkle-trees", "crypto", "accumulator", "no_std"]
 categories = ["data-structures"]
 license = "Apache-2.0"
+
+[lib]
+doctest = false
 
 [dependencies]
 codec = { version = "2.3.0", package = "parity-scale-codec", default-features = false, features = ["derive"] }

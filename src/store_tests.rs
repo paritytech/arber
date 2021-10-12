@@ -43,7 +43,7 @@ fn append_works() {
 }
 
 #[test]
-fn peak_hash_at_works() {
+fn peak_hash_works() {
     let mut store = VecStore::<Vec<u8>>::new();
 
     let elem = vec![0u8; 10];
@@ -54,17 +54,17 @@ fn peak_hash_at_works() {
     let h = elem.hash();
     let _ = store.append(&elem, &[h]);
 
-    let peak = store.peak_hash_at(1).unwrap();
+    let peak = store.hash_at(1).unwrap();
 
     assert_eq!(h, peak);
 }
 
 #[test]
-fn peak_hash_at_fails() {
+fn peak_hash_fails() {
     let want = Err(Error::MissingHashAtIndex(3));
 
     let store = VecStore::<Vec<u8>>::new();
-    let got = store.peak_hash_at(3);
+    let got = store.hash_at(3);
 
     assert_eq!(want, got);
 }

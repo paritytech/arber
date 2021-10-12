@@ -217,7 +217,7 @@ where
     pub fn peaks(&self) -> Vec<Hash> {
         utils::peaks(self.size)
             .into_iter()
-            .filter_map(move |p| self.store.peak_hash_at(p.saturating_sub(1)).ok())
+            .filter_map(move |p| self.store.hash_at(p.saturating_sub(1)).ok())
             .collect()
     }
 
@@ -264,7 +264,7 @@ where
 
         while (peak_map & height) != 0 {
             let left_idx = idx + 1 - 2 * height;
-            let left_hash = self.store.peak_hash_at(left_idx)?;
+            let left_hash = self.store.hash_at(left_idx)?;
 
             idx += 1; // idx for new peak
 

@@ -15,6 +15,8 @@
 
 //! Merkle-Mountain-Range storage
 
+use codec::{Decode, Encode};
+
 use crate::{vec, Error, Hash, Result, Vec};
 
 #[cfg(test)]
@@ -23,7 +25,7 @@ mod tests;
 
 pub trait Store<T>
 where
-    T: Clone,
+    T: Clone + Decode + Encode,
 {
     fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<()>;
 
@@ -39,7 +41,7 @@ pub struct VecStore<T> {
 
 impl<T> Store<T> for VecStore<T>
 where
-    T: Clone,
+    T: Clone + Decode + Encode,
 {
     fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<()> {
         if let Some(data) = &mut self.data {

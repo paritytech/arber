@@ -25,6 +25,7 @@ include!("no_std.rs");
 
 use core::marker::PhantomData;
 
+use codec::{Decode, Encode};
 use hash::ZERO_HASH;
 use utils::is_leaf;
 
@@ -54,7 +55,7 @@ mod tests;
 /// locations.
 pub struct MerkleMountainRange<T, S>
 where
-    T: Hashable + Clone,
+    T: Hashable + Clone + Decode + Encode,
     S: Store<T>,
 {
     // total number of MMR nodes, i.e. MMR size
@@ -67,7 +68,7 @@ where
 
 impl<'a, T, S> MerkleMountainRange<T, S>
 where
-    T: Hashable + Clone,
+    T: Hashable + Clone + Decode + Encode,
     S: Store<T>,
 {
     pub fn new(size: u64, store: S) -> Self {

@@ -32,7 +32,7 @@ use utils::is_leaf;
 pub use error::{Error, Result};
 pub use hash::{hash_with_index, Hash, Hashable};
 pub use proof::MerkleProof;
-pub use store::{Store, VecStore};
+pub use store::{MutableStore, VecStore};
 
 mod error;
 mod hash;
@@ -56,7 +56,7 @@ mod tests;
 pub struct MerkleMountainRange<T, S>
 where
     T: Hashable + Clone + Decode + Encode,
-    S: Store<T>,
+    S: MutableStore<T>,
 {
     // total number of MMR nodes, i.e. MMR size
     size: u64,
@@ -69,7 +69,7 @@ where
 impl<'a, T, S> MerkleMountainRange<T, S>
 where
     T: Hashable + Clone + Decode + Encode,
-    S: Store<T>,
+    S: MutableStore<T>,
 {
     pub fn new(size: u64, store: S) -> Self {
         MerkleMountainRange {

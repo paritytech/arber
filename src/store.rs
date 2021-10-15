@@ -23,7 +23,7 @@ use crate::{vec, Error, Hash, Result, Vec};
 #[path = "store_tests.rs"]
 mod tests;
 
-pub trait Store<T>
+pub trait MutableStore<T>
 where
     T: Clone + Decode + Encode,
 {
@@ -39,7 +39,7 @@ pub struct VecStore<T> {
     pub hashes: Vec<Hash>,
 }
 
-impl<T> Store<T> for VecStore<T>
+impl<T> MutableStore<T> for VecStore<T>
 where
     T: Clone + Decode + Encode,
 {

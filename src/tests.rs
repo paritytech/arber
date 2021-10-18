@@ -34,6 +34,20 @@ fn make_mmr(num_leafs: u8) -> MerkleMountainRange<E, VecStore<E>> {
 }
 
 #[test]
+fn new_works() -> Result<(), Error> {
+    let mmr = make_mmr(6);
+    let hash = mmr.hash(5)?;
+
+    // new MMR using a populated store
+    let store = mmr.store;
+    let mmr = MerkleMountainRange::<E, VecStore<E>>::new(mmr.size, store);
+
+    assert_eq!(hash, mmr.hash(5)?);
+
+    Ok(())
+}
+
+#[test]
 fn append_two_nodes() -> Result<(), Error> {
     let s = VecStore::<E>::new();
     let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);

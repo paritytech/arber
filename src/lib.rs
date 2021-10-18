@@ -32,7 +32,7 @@ use utils::is_leaf;
 pub use error::{Error, Result};
 pub use hash::{hash_with_index, Hash, Hashable};
 pub use proof::MerkleProof;
-pub use store::{MutableStore, VecStore};
+pub use store::{MutableStore, VecStore, Store};
 
 mod error;
 mod hash;

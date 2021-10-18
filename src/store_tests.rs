@@ -15,7 +15,7 @@
 
 //! Merkle-Mountain-Range storage unit tests
 
-use super::{Error, MutableStore, VecStore};
+use super::{Error, MutableStore, Store, VecStore};
 use crate::Hashable;
 
 #[test]

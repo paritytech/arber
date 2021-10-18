@@ -23,13 +23,18 @@ use crate::{vec, Error, Hash, Result, Vec};
 #[path = "store_tests.rs"]
 mod tests;
 
-pub trait MutableStore<T>
+pub trait Store<T>
+where
+    T: Clone + Decode + Encode,
+{
+    fn hash_at(&self, index: u64) -> Result<Hash>;
+}
+
+pub trait MutableStore<T>: Store<T>
 where
     T: Clone + Decode + Encode,
 {
     fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<()>;
-
-    fn hash_at(&self, idx: u64) -> Result<Hash>;
 }
 
 pub struct VecStore<T> {
@@ -37,6 +42,18 @@ pub struct VecStore<T> {
     pub data: Option<Vec<T>>,
     /// MMR hashes for both, laves and parents
     pub hashes: Vec<Hash>,
+}
+
+impl<T> Store<T> for VecStore<T>
+where
+    T: Clone + Decode + Encode,
+{
+    fn hash_at(&self, index: u64) -> Result<Hash> {
+        self.hashes
+            .get(index as usize)
+            .cloned()
+            .ok_or(Error::MissingHashAtIndex(index))
+    }
 }
 
 impl<T> MutableStore<T> for VecStore<T>
@@ -51,13 +68,6 @@ where
         self.hashes.extend_from_slice(hashes);
 
         Ok(())
-    }
-
-    fn hash_at(&self, idx: u64) -> Result<Hash> {
-        self.hashes
-            .get(idx as usize)
-            .cloned()
-            .ok_or(Error::MissingHashAtIndex(idx))
     }
 }
 

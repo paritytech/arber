@@ -17,13 +17,13 @@
 
 use crate::{hash::ZERO_HASH, Hashable};
 
-use super::{hash_with_index, Error, Hash, MerkleMountainRange, VecStore};
+use super::{hash_with_index, Error, Hash, MutableMerkleMountainRange, VecStore};
 
 type E = Vec<u8>;
 
-fn make_mmr(num_leafs: u8) -> MerkleMountainRange<E, VecStore<E>> {
+fn make_mmr(num_leafs: u8) -> MutableMerkleMountainRange<E, VecStore<E>> {
     let s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
+    let mut mmr = MutableMerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     (0..=num_leafs.saturating_sub(1)).for_each(|i| {
         let n = vec![i, 10];
@@ -40,7 +40,7 @@ fn new_works() -> Result<(), Error> {
 
     // new MMR using a populated store
     let store = mmr.store;
-    let mmr = MerkleMountainRange::<E, VecStore<E>>::new(mmr.size, store);
+    let mmr = MutableMerkleMountainRange::<E, VecStore<E>>::new(mmr.size, store);
 
     assert_eq!(hash, mmr.hash(5)?);
 
@@ -50,7 +50,7 @@ fn new_works() -> Result<(), Error> {
 #[test]
 fn append_two_nodes() -> Result<(), Error> {
     let s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
+    let mut mmr = MutableMerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     let n1 = vec![0u8, 10];
     let pos = mmr.append(&n1)?;
@@ -68,7 +68,7 @@ fn append_two_nodes() -> Result<(), Error> {
 #[test]
 fn append_tree_nodes() -> Result<(), Error> {
     let s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
+    let mut mmr = MutableMerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     let n1 = vec![0u8, 10];
     let pos = mmr.append(&n1)?;
@@ -91,7 +91,7 @@ fn append_tree_nodes() -> Result<(), Error> {
 #[test]
 fn validate_works() -> Result<(), Error> {
     let s = VecStore::<E>::new();
-    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
+    let mut mmr = MutableMerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     // empty MMR is valid
     assert!(mmr.validate()?);
@@ -302,7 +302,7 @@ fn peak_path_works() -> Result<(), Error> {
 #[test]
 fn hash_error_works() {
     let s = VecStore::<E>::new();
-    let mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
+    let mmr = MutableMerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     let want = Error::MissingHashAtIndex(0);
     let got = mmr.hash(0).err().unwrap();
@@ -434,7 +434,7 @@ fn root_works() -> Result<(), Error> {
 #[test]
 fn root_fails() -> Result<(), Error> {
     let s = VecStore::<E>::new();
-    let mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
+    let mmr = MutableMerkleMountainRange::<E, VecStore<E>>::new(0, s);
     let root = mmr.root()?;
 
     assert_eq!(ZERO_HASH, root);

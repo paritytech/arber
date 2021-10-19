@@ -32,7 +32,7 @@ use utils::is_leaf;
 pub use error::{Error, Result};
 pub use hash::{hash_with_index, Hash, Hashable};
 pub use proof::MerkleProof;
-pub use store::{MutableStore, VecStore, Store};
+pub use store::{MutableStore, Store, VecStore};
 
 mod error;
 mod hash;
@@ -53,7 +53,7 @@ mod tests;
 ///
 /// Again, positions are `'1'` based tree node positions, indices are `'0'` based `Store`
 /// locations.
-pub struct MerkleMountainRange<T, S>
+pub struct MutableMerkleMountainRange<T, S>
 where
     T: Hashable + Clone + Decode + Encode,
     S: MutableStore<T>,
@@ -66,13 +66,13 @@ where
     _marker: PhantomData<T>,
 }
 
-impl<'a, T, S> MerkleMountainRange<T, S>
+impl<'a, T, S> MutableMerkleMountainRange<T, S>
 where
     T: Hashable + Clone + Decode + Encode,
     S: MutableStore<T>,
 {
     pub fn new(size: u64, store: S) -> Self {
-        MerkleMountainRange {
+        MutableMerkleMountainRange {
             size,
             store,
             _marker: PhantomData,

@@ -15,7 +15,7 @@
 
 //! Merkle proof store tests
 
-use arber::{hash_with_index, Hashable, MerkleMountainRange, MerkleProof, VecStore};
+use arber::{hash_with_index, Hashable, MerkleMountainRange, MerkleProof, Result, VecStore};
 use codec::{DecodeAll, Encode};
 
 type E = Vec<u8>;
@@ -43,24 +43,26 @@ fn non_existing_node() {
 }
 
 #[test]
-fn single_node() {
+fn single_node() -> Result<()> {
     let s = VecStore::<E>::new();
     let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     let node = vec![42u8];
-    let size = mmr.append(&node).unwrap();
-    let proof = mmr.proof(size).unwrap();
+    let size = mmr.append(&node)?;
+    let proof = mmr.proof(size)?;
 
     // this root hash is wrong because is has not been hashed with the node index
-    let root = node.hash();
+    let root = node.encode().hash();
 
     assert_eq!(
-        "invalid root hash: 8c058212512f != e00265169656".to_string(),
+        "invalid root hash: 3094cb0980c1 != 72210a453b2f".to_string(),
         format!("{}", proof.verify(root, &node, size).err().unwrap())
     );
 
-    let root = hash_with_index(0, &root);
-    assert!(proof.verify(root, &node, size).unwrap());
+    let root = hash_with_index(0, &root.hash());
+    assert!(proof.verify(root, &node, size)?);
+
+    Ok(())
 }
 
 #[test]

@@ -40,15 +40,18 @@ impl MerkleProof {
     }
 
     /// Verfiy that `elem` is a MMR node at positon `pos` given the root hash `root`.
-    pub fn verify(&self, root: Hash, elem: &dyn Hashable, pos: u64) -> Result<bool, Error> {
+    pub fn verify<T>(&self, root: Hash, elem: &T, pos: u64) -> Result<bool, Error>
+    where
+        T: Clone + Encode,
+    {
         let peaks = utils::peaks(self.mmr_size);
-        self.clone().do_verify(root, elem, pos, &peaks)
+        self.clone().do_verify(root, elem.encode(), pos, &peaks)
     }
 
     fn do_verify(
         &mut self,
         root: Hash,
-        elem: &dyn Hashable,
+        elem: Vec<u8>,
         pos: u64,
         peaks: &[u64],
     ) -> Result<bool, Error> {

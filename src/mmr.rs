@@ -37,7 +37,7 @@ mod tests;
 /// locations.
 pub struct MerkleMountainRange<T, S>
 where
-    T: Hashable + Clone + Decode + Encode,
+    T: Clone + Decode + Encode,
     S: Store<T>,
 {
     // total number of MMR nodes, i.e. MMR size
@@ -50,7 +50,7 @@ where
 
 impl<'a, T, S> MerkleMountainRange<T, S>
 where
-    T: Hashable + Clone + Decode + Encode,
+    T: Clone + Decode + Encode,
     S: Store<T>,
 {
     pub fn new(size: u64, store: S) -> Self {
@@ -64,7 +64,7 @@ where
     /// Append `elem` to the MMR. Return new MMR size.
     pub fn append(&mut self, elem: &T) -> Result<u64> {
         let idx = self.size;
-        let node_hash = hash_with_index(idx, &elem.clone().hash());
+        let node_hash = hash_with_index(idx, &elem.encode().hash());
 
         let (peak_map, node_height) = utils::peak_height_map(idx);
 

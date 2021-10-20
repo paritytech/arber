@@ -15,6 +15,8 @@
 
 //! Merkle-Mountain-Range implementation unit tests
 
+use codec::Encode;
+
 use crate::{
     hash::ZERO_HASH, hash_with_index, Error, Hash, Hashable, MerkleMountainRange, VecStore,
 };
@@ -121,34 +123,22 @@ fn validate_works() -> Result<(), Error> {
 fn validate_fails() -> Result<(), Error> {
     let mut mmr = make_mmr(3);
 
-    let want = Error::InvalidNodeHash(
-        2,
-        Hash::from_hex("0x00000000000000000000000000000000")?,
-        Hash::from_hex("0x9f7d5dc4ed828ec11a1101e7a047dd7d")?,
-    );
-
     mmr.store.hashes[2] = Hash::from_hex("0x00")?;
     let got = mmr.validate().err().unwrap();
 
     // compare the actual error messages
-    let want = format!("{}", want);
+    let want = "invalid node hash at idx 2: 000000000000 != 4f463b04ba9e".to_string();
     let got = format!("{}", got);
 
     assert_eq!(want, got);
 
     let mut mmr = make_mmr(7);
 
-    let want = Error::InvalidNodeHash(
-        6,
-        Hash::from_hex("0x00000000000000000000000000000000")?,
-        Hash::from_hex("0x2cabe06f9728067daa538c96edbd6ef7")?,
-    );
-
     mmr.store.hashes[6] = Hash::from_hex("0x00")?;
     let got = mmr.validate().err().unwrap();
 
     // compare the actual error messages
-    let want = format!("{}", want);
+    let want = "invalid node hash at idx 6: 000000000000 != 36d109372a04".to_string();
     let got = format!("{}", got);
 
     assert_eq!(want, got);
@@ -319,11 +309,11 @@ fn hash_error_works() {
 fn hash_works() -> Result<(), Error> {
     let mmr = make_mmr(3);
 
-    let h1 = hash_with_index(0, &vec![0u8, 10].hash());
+    let h1 = hash_with_index(0, &vec![0u8, 10].encode().hash());
     let h = mmr.hash(1)?;
     assert_eq!(h, h1);
 
-    let h2 = hash_with_index(1, &vec![1u8, 10].hash());
+    let h2 = hash_with_index(1, &vec![1u8, 10].encode().hash());
     let h = mmr.hash(2)?;
     assert_eq!(h, h2);
 
@@ -331,21 +321,21 @@ fn hash_works() -> Result<(), Error> {
     let h = mmr.hash(3)?;
     assert_eq!(h, h3);
 
-    let h4 = hash_with_index(3, &vec![2u8, 10].hash());
+    let h4 = hash_with_index(3, &vec![2u8, 10].encode().hash());
     let h = mmr.hash(4)?;
     assert_eq!(h, h4);
 
     let mmr = make_mmr(4);
 
-    let h1 = hash_with_index(3, &vec![2u8, 10].hash());
+    let h1 = hash_with_index(3, &vec![2u8, 10].encode().hash());
     let h = mmr.hash(4)?;
     assert_eq!(h, h1);
 
-    let h2 = hash_with_index(4, &vec![3u8, 10].hash());
+    let h2 = hash_with_index(4, &vec![3u8, 10].encode().hash());
     let h = mmr.hash(5)?;
     assert_eq!(h, h2);
 
-    let h3 = hash_with_index(5, &(h1, h2).hash());
+    let h3 = hash_with_index(5, &(h1, h2).encode().hash());
     let h = mmr.hash(6)?;
     assert_eq!(h, h3);
 

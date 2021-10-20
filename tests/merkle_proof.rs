@@ -15,14 +15,14 @@
 
 //! Merkle proof store tests
 
-use arber::{hash_with_index, Hashable, MerkleProof, MutableMerkleMountainRange, VecStore};
+use arber::{hash_with_index, Hashable, MerkleMountainRange, MerkleProof, VecStore};
 use codec::{DecodeAll, Encode};
 
 type E = Vec<u8>;
 
-fn make_mmr(num_leafs: u8) -> MutableMerkleMountainRange<E, VecStore<E>> {
+fn make_mmr(num_leafs: u8) -> MerkleMountainRange<E, VecStore<E>> {
     let s = VecStore::<E>::new();
-    let mut mmr = MutableMerkleMountainRange::<E, VecStore<E>>::new(0, s);
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     (0..=num_leafs.saturating_sub(1)).for_each(|i| {
         let n = vec![i];
@@ -45,7 +45,7 @@ fn non_existing_node() {
 #[test]
 fn single_node() {
     let s = VecStore::<E>::new();
-    let mut mmr = MutableMerkleMountainRange::<E, VecStore<E>>::new(0, s);
+    let mut mmr = MerkleMountainRange::<E, VecStore<E>>::new(0, s);
 
     let node = vec![42u8];
     let size = mmr.append(&node).unwrap();

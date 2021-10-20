@@ -28,12 +28,7 @@ where
     T: Clone + Decode + Encode,
 {
     fn hash_at(&self, index: u64) -> Result<Hash>;
-}
 
-pub trait MutableStore<T>: Store<T>
-where
-    T: Clone + Decode + Encode,
-{
     fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<()>;
 }
 
@@ -54,12 +49,7 @@ where
             .cloned()
             .ok_or(Error::MissingHashAtIndex(index))
     }
-}
 
-impl<T> MutableStore<T> for VecStore<T>
-where
-    T: Clone + Decode + Encode,
-{
     fn append(&mut self, elem: &T, hashes: &[Hash]) -> Result<()> {
         if let Some(data) = &mut self.data {
             data.push(elem.clone());

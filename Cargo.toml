@@ -15,7 +15,10 @@ doctest = false
 
 [dependencies]
 codec = { version = "2.3.0", package = "parity-scale-codec", default-features = false, features = ["derive"] }
+scale-info = { version = "1.0", default-features = false, features = ["derive"] }
+
 displaydoc = { version = "0.2", default-features = false}
+
 
 blake2 = "0.9"
 
@@ -31,5 +34,6 @@ harness = false
 default = ["std"]
 std = [
 	"codec/std",
+	"scale-info/std",
 	"displaydoc/std",
 ]

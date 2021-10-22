@@ -26,6 +26,7 @@ use alloc::string::ToString;
 
 use blake2::{Blake2b, Digest};
 use codec::{Decode, Encode, EncodeLike};
+use scale_info::TypeInfo;
 
 use crate::{Error, String, Vec};
 
@@ -47,7 +48,7 @@ macro_rules! to_hex {
 
 /// Generic hash type which should be compatible with most hashes used
 /// within the blockchain domain.
-#[derive(Copy, Clone, PartialEq, Eq, Encode, Decode)]
+#[derive(Copy, Clone, PartialEq, Eq, Encode, Decode, Default, TypeInfo)]
 pub struct Hash(pub [u8; 32]);
 
 impl EncodeLike<[u8; 32]> for Hash {}

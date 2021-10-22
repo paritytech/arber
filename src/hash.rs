@@ -25,7 +25,7 @@ use core::{
 use alloc::string::ToString;
 
 use blake2::{Blake2b, Digest};
-use codec::{Decode, Encode};
+use codec::{Decode, Encode, EncodeLike};
 
 use crate::{Error, String, Vec};
 
@@ -49,6 +49,8 @@ macro_rules! to_hex {
 /// within the blockchain domain.
 #[derive(Copy, Clone, PartialEq, Eq, Encode, Decode)]
 pub struct Hash(pub [u8; 32]);
+
+impl EncodeLike<[u8; 32]> for Hash {}
 
 /// A hash consisting of all zeros.
 pub const ZERO_HASH: Hash = Hash([0; 32]);

@@ -197,11 +197,16 @@ where
     ///
     /// Peaks are listed left to right, starting with the leftmost peak. The leftmost
     /// peak is also always the 'highest' peak.
-    pub fn peaks(&self) -> Vec<Hash> {
-        utils::peaks(self.size)
-            .into_iter()
-            .filter_map(move |p| self.store.hash_at(p.saturating_sub(1)).ok())
-            .collect()
+    pub fn peaks(&self) -> Result<Vec<Hash>> {
+        let peaks = utils::peaks(self.size);
+
+        let mut hashes = Vec::new();
+
+        for p in peaks {
+            hashes.push(self.store.hash_at(p.saturating_sub(1))?);
+        }
+
+        Ok(hashes)
     }
 
     /// Return the root hash of the MMR.
@@ -213,7 +218,7 @@ where
         }
 
         let mut hash = None;
-        let peaks = self.peaks();
+        let peaks = self.peaks()?;
 
         for p in peaks.into_iter().rev() {
             hash = match hash {

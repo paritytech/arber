@@ -345,32 +345,32 @@ fn hash_works() -> Result<(), Error> {
 #[test]
 fn peaks_works() -> Result<(), Error> {
     let mmr = make_mmr(1);
-    let peaks = mmr.peaks();
+    let peaks = mmr.peaks()?;
 
     assert!(peaks.len() == 1);
     assert_eq!(mmr.hash(mmr.size)?, peaks[0]);
 
     let mmr = make_mmr(2);
-    let peaks = mmr.peaks();
+    let peaks = mmr.peaks()?;
 
     assert!(peaks.len() == 1);
     assert_eq!(mmr.hash(mmr.size)?, peaks[0]);
 
     let mmr = make_mmr(4);
-    let peaks = mmr.peaks();
+    let peaks = mmr.peaks()?;
 
     assert!(peaks.len() == 1);
     assert_eq!(mmr.hash(mmr.size)?, peaks[0]);
 
     let mmr = make_mmr(10);
-    let peaks = mmr.peaks();
+    let peaks = mmr.peaks()?;
 
     assert!(peaks.len() == 2);
     assert_eq!(mmr.hash(15)?, peaks[0]);
     assert_eq!(mmr.hash(18)?, peaks[1]);
 
     let mmr = make_mmr(11);
-    let peaks = mmr.peaks();
+    let peaks = mmr.peaks()?;
 
     assert!(peaks.len() == 3);
     assert_eq!(mmr.hash(15)?, peaks[0]);

@@ -85,7 +85,7 @@ where
     /// Retrun `true`, if the MMR is valid or an error.
     pub fn validate(&self) -> Result<bool> {
         for pos in 1..=self.size {
-            let height = utils::node_height(pos);
+            let height = utils::node_height(pos.saturating_sub(1));
 
             // inner nodes, i.e. parents start at height 1
             if height > 0 {
@@ -121,7 +121,7 @@ where
     /// See [`partial_proof()`] for a proof containing only a subset of the nodes.
     ///
     pub fn proof(&self, pos: u64) -> Result<MerkleProof> {
-        if !utils::is_leaf(pos) {
+        if !utils::is_leaf(pos.saturating_sub(1)) {
             return Err(Error::ExpectingLeafNode(pos));
         }
 

@@ -51,44 +51,47 @@ fn peaks_works() {
 fn node_height_works() {
     assert_eq!(node_height(0), 0);
     assert_eq!(node_height(1), 0);
-    assert_eq!(node_height(2), 0);
-    assert_eq!(node_height(3), 1);
+    assert_eq!(node_height(2), 1);
+    assert_eq!(node_height(3), 0);
     assert_eq!(node_height(4), 0);
-    assert_eq!(node_height(5), 0);
-    assert_eq!(node_height(6), 1);
-    assert_eq!(node_height(7), 2);
+    assert_eq!(node_height(5), 1);
+    assert_eq!(node_height(6), 2);
+    assert_eq!(node_height(7), 0);
     assert_eq!(node_height(8), 0);
-    assert_eq!(node_height(10), 1);
-    assert_eq!(node_height(15), 3);
+    assert_eq!(node_height(10), 0);
+    assert_eq!(node_height(15), 0);
     assert_eq!(node_height(16), 0);
-    assert_eq!(node_height(18), 1);
+    assert_eq!(node_height(18), 0);
     assert_eq!(node_height(19), 0);
-    assert_eq!(node_height(28), 1);
-    assert_eq!(node_height(29), 2);
-    assert_eq!(node_height(30), 3);
-    assert_eq!(node_height(31), 4);
+    assert_eq!(node_height(28), 2);
+    assert_eq!(node_height(29), 3);
+    assert_eq!(node_height(30), 4);
+    assert_eq!(node_height(31), 0);
 }
 
 #[test]
 fn is_leaf_works() {
     assert!(is_leaf(0));
     assert!(is_leaf(1));
-    assert!(is_leaf(2));
-    assert!(!is_leaf(3));
+    assert!(!is_leaf(2));
+    assert!(is_leaf(3));
     assert!(is_leaf(4));
-    assert!(is_leaf(5));
+    assert!(!is_leaf(5));
     assert!(!is_leaf(6));
-    assert!(!is_leaf(7));
+    assert!(is_leaf(7));
     assert!(is_leaf(8));
-    assert!(!is_leaf(10));
-    assert!(!is_leaf(15));
+    assert!(!is_leaf(9));
+    assert!(is_leaf(10));
+    assert!(is_leaf(11));
+    assert!(!is_leaf(14));
+    assert!(is_leaf(15));
     assert!(is_leaf(16));
-    assert!(!is_leaf(18));
-    assert!(is_leaf(19));
+    assert!(!is_leaf(17));
+    assert!(is_leaf(18));
+    assert!(!is_leaf(27));
     assert!(!is_leaf(28));
     assert!(!is_leaf(29));
     assert!(!is_leaf(30));
-    assert!(!is_leaf(31));
 }
 
 #[test]

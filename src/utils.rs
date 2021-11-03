@@ -68,12 +68,12 @@ pub(crate) fn peaks(size: u64) -> Vec<u64> {
     peaks
 }
 
-/// Return the height of a node at postion `pos`.
+/// Return the height of a node at index `idx`.
 ///
 /// The height is calculated as if the node is part of a fully balanced binary
 /// tree and the nodes are visited in postorder traversal.
-pub(crate) fn node_height(pos: u64) -> u64 {
-    let mut idx = pos.saturating_sub(1);
+pub(crate) fn node_height(idx: u64) -> u64 {
+    let mut idx = idx;
 
     if idx == 0 {
         return 0;
@@ -91,11 +91,11 @@ pub(crate) fn node_height(pos: u64) -> u64 {
     idx
 }
 
-/// Return true if the node at `pos` is a leaf node.
+/// Return true if the node at `idx` is a leaf node.
 ///
 /// This is a convenience wrapper around [`node_height`]
-pub(crate) fn is_leaf(pos: u64) -> bool {
-    node_height(pos) == 0
+pub(crate) fn is_leaf(idx: u64) -> bool {
+    node_height(idx) == 0
 }
 
 /// Return the height of the MMR peaks **before** a node at (0-based) index `idx`

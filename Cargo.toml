@@ -23,7 +23,7 @@ displaydoc = { version = "0.2", default-features = false}
 blake2 = "0.9"
 
 [dev-dependencies]
-criterion = "0.3"
+criterion = "0.4"
 rand = "0.8"
 
 [[bench]]

@@ -15,7 +15,7 @@ doctest = false
 
 [dependencies]
 codec = { version = "2.3.1", package = "parity-scale-codec", default-features = false, features = ["derive"] }
-scale-info = { version = "1.0", default-features = false, features = ["derive"] }
+scale-info = { version = "2.3", default-features = false, features = ["derive"] }
 
 displaydoc = { version = "0.2", default-features = false}
 

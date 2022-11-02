@@ -20,7 +20,7 @@ displaydoc = { version = "0.2", default-features = false }
 scale-info = { version = "1.0", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
-criterion = "0.3"
+criterion = "0.4.0"
 rand = "0.8"
 
 [[bench]]

@@ -20,9 +20,9 @@ use super::{hash_with_index, Error, Hash, Hashable};
 
 macro_rules! hash_two {
     ($a:expr, $b:expr) => {{
-        use blake2::{Blake2b, Digest};
+        use blake2::{digest::consts::U32, Blake2b, Digest};
 
-        let mut h = Blake2b::new();
+        let mut h = Blake2b::<U32>::new();
         h.update($a);
         h.update($b);
         let v = h.finalize();

@@ -56,7 +56,7 @@ fn single_node() -> Result<()> {
     let root = node.encode().hash();
 
     assert_eq!(
-        "invalid root hash: 3094cb0980c1 != 72210a453b2f".to_string(),
+        "invalid root hash: 22f305cc9063 != 3383f75810a7".to_string(),
         format!("{}", proof.verify(root, &node, size).err().unwrap())
     );
 

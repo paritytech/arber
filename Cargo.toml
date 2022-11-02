@@ -14,7 +14,7 @@ license = "Apache-2.0"
 doctest = false
 
 [dependencies]
-blake2 = "0.9"
+blake2 = "0.10.4"
 codec = { version = "3.2.1", package = "parity-scale-codec", default-features = false, features = ["derive"] }
 displaydoc = { version = "0.2", default-features = false }
 scale-info = { version = "2.3.0", default-features = false, features = ["derive"] }

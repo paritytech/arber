@@ -116,7 +116,7 @@ fn proof_encode_decode() {
     let mmr = make_mmr(11);
     let proof = mmr.proof(5).unwrap();
     let bytes = proof.encode();
-    let proof = MerkleProof::decode_all(&bytes).unwrap();
+    let proof = MerkleProof::decode_all(&mut bytes.as_slice()).unwrap();
 
     assert!(proof.verify(mmr.root().unwrap(), &vec![3u8], 5).unwrap());
 }

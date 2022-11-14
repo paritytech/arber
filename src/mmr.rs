@@ -49,7 +49,7 @@ where
     _marker: PhantomData<T>,
 }
 
-impl<'a, T, S> MerkleMountainRange<T, S>
+impl<T, S> MerkleMountainRange<T, S>
 where
     T: Clone + Decode + Encode,
     S: Store<T>,

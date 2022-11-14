@@ -128,7 +128,7 @@ fn validate_fails() -> Result<(), Error> {
     let got = mmr.validate().err().unwrap();
 
     // compare the actual error messages
-    let want = "invalid node hash at idx 2: 000000000000 != 4f463b04ba9e".to_string();
+    let want = "invalid node hash at idx 2: 000000000000 != dac8901f3f3a".to_string();
     let got = format!("{}", got);
 
     assert_eq!(want, got);
@@ -139,7 +139,7 @@ fn validate_fails() -> Result<(), Error> {
     let got = mmr.validate().err().unwrap();
 
     // compare the actual error messages
-    let want = "invalid node hash at idx 6: 000000000000 != 36d109372a04".to_string();
+    let want = "invalid node hash at idx 6: 000000000000 != 58d5c10b0190".to_string();
     let got = format!("{}", got);
 
     assert_eq!(want, got);

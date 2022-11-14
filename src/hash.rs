@@ -25,7 +25,7 @@ use core::{
 #[cfg(not(feature = "std"))]
 use alloc::string::ToString;
 
-use blake2::{Blake2b, Digest};
+use blake2::{digest::consts::U32, Blake2b, Digest};
 use codec::{Decode, Encode, EncodeLike};
 use scale_info::TypeInfo;
 
@@ -124,7 +124,7 @@ pub trait Hashable {
 
 impl Hashable for Vec<u8> {
     fn hash(&self) -> Hash {
-        let mut h = Blake2b::new();
+        let mut h = Blake2b::<U32>::new();
         h.update(self);
         let v = h.finalize();
         Hash::from_vec(&v)
@@ -133,7 +133,7 @@ impl Hashable for Vec<u8> {
 
 impl Hashable for u32 {
     fn hash(&self) -> Hash {
-        let mut h = Blake2b::new();
+        let mut h = Blake2b::<U32>::new();
         h.update(self.to_le_bytes());
         let v = h.finalize();
         Hash::from_vec(&v)
@@ -142,7 +142,7 @@ impl Hashable for u32 {
 
 impl Hashable for u64 {
     fn hash(&self) -> Hash {
-        let mut h = Blake2b::new();
+        let mut h = Blake2b::<U32>::new();
         h.update(self.to_le_bytes());
         let v = h.finalize();
         Hash::from_vec(&v)
@@ -162,7 +162,7 @@ where
     B: Hashable,
 {
     fn hash(&self) -> Hash {
-        let mut h = Blake2b::new();
+        let mut h = Blake2b::<U32>::new();
         h.update(self.0.hash());
         h.update(self.1.hash());
         let v = h.finalize();
@@ -174,7 +174,7 @@ where
 ///
 /// This function is used to avoid collisions among leaf data hashes themselves.
 pub fn hash_with_index(idx: u64, hash: &Hash) -> Hash {
-    let mut h = Blake2b::new();
+    let mut h = Blake2b::<U32>::new();
     h.update(idx.to_le_bytes());
     h.update(hash);
     let v = h.finalize();
